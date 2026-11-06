@@ -162,6 +162,42 @@ th.sel,td.sel{background-image:linear-gradient(var(--acc2),var(--acc2))}
 .gal{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px}
 .gal figure{margin:0;width:92px;text-align:center;font-size:10.5px;color:var(--mut)}
 .gal img{width:92px;height:64px;object-fit:cover;border-radius:12px;border:1px solid var(--bd);display:block;margin-bottom:3px}
+/* ============ intro + motion ============ */
+#intro{position:fixed;inset:0;z-index:200;background:#07070b;color:#f4f2ee;overflow:hidden;display:grid;place-items:center;cursor:pointer;
+ clip-path:inset(0 0 0 0);transition:clip-path 1s cubic-bezier(.76,0,.24,1)}
+#intro.out{clip-path:inset(0 0 100% 0)}
+#intro .i-bg{position:absolute;inset:-30%;background:conic-gradient(from 0deg,#2a160e,#7a4a2e,#c07a45,#e0457b,#6b4bff,#3fa7d6,#ead09b,#2a160e);filter:blur(80px) saturate(140%);opacity:.0;animation:iSpin 9s linear infinite,iFade 1.4s .1s ease forwards}
+#intro .i-grain{position:absolute;inset:0;opacity:.14;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+#intro .i-vig{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,.75) 100%)}
+#intro .i-word{position:relative;z-index:2;text-align:center;font-weight:800;letter-spacing:-.06em;line-height:.86;font-size:clamp(56px,13vw,210px);text-transform:uppercase}
+#intro .ln{display:block;overflow:hidden;padding:0 .04em .04em}
+#intro .ch{display:inline-block;transform:translateY(110%) rotate(6deg);animation:iUp .9s cubic-bezier(.2,.9,.1,1) forwards;animation-delay:calc(.15s + var(--i)*45ms)}
+#intro .ln.alt .ch{background:linear-gradient(90deg,#ffb35c,#ff6fae,#7b98ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+#intro.leaving .ch{animation:iOut .7s cubic-bezier(.7,0,.3,1) forwards;animation-delay:calc(var(--i)*25ms)}
+#intro .i-count{position:absolute;left:clamp(16px,4vw,48px);bottom:clamp(14px,4vh,40px);z-index:2;font-size:clamp(48px,9vw,130px);font-weight:800;letter-spacing:-.05em;font-variant-numeric:tabular-nums;line-height:1}
+#intro .i-meta{position:absolute;right:clamp(16px,4vw,48px);bottom:clamp(20px,5vh,52px);z-index:2;text-align:right;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:0;animation:iFade .8s .6s ease forwards}
+#intro .i-meta span{display:block;opacity:.55;margin-top:4px;letter-spacing:.1em}
+#intro .i-top{position:absolute;left:clamp(16px,4vw,48px);right:clamp(16px,4vw,48px);top:clamp(16px,4vh,36px);z-index:2;display:flex;justify-content:space-between;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;opacity:0;animation:iFade .8s .3s ease forwards}
+#intro .i-bar{position:absolute;left:0;right:0;bottom:0;height:3px;z-index:2;background:rgba(255,255,255,.1)}
+#intro .i-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffb35c,#ff6fae,#7b98ff)}
+@keyframes iUp{to{transform:translateY(0) rotate(0)}}
+@keyframes iOut{from{transform:translateY(0)}to{transform:translateY(-115%) rotate(-4deg)}}
+@keyframes iFade{to{opacity:1}}
+@keyframes iSpin{to{transform:rotate(360deg)}}
+/* page entrance */
+.rise{animation:rise .9s cubic-bezier(.2,.9,.1,1) both;animation-delay:var(--d,0ms)}
+@keyframes rise{from{opacity:0;transform:translateY(34px) scale(.985);filter:blur(8px)}to{opacity:1;transform:none;filter:none}}
+.rise-sm{animation:riseSm .55s cubic-bezier(.2,.9,.1,1) both;animation-delay:var(--d,0ms)}
+@keyframes riseSm{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+header.rise{animation-name:dropIn}
+@keyframes dropIn{from{opacity:0;transform:translateY(-24px)}to{opacity:1;transform:none}}
+.hero h1 .w{display:inline-block;overflow:hidden;vertical-align:top}
+.hero h1 .w>span{display:inline-block;animation:iUp .9s cubic-bezier(.2,.9,.1,1) both;transform:translateY(105%);animation-delay:calc(var(--d,0ms) + var(--i)*55ms)}
+/* custom cursor (fine pointers only) */
+#cur{position:fixed;left:0;top:0;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#fff;mix-blend-mode:difference;pointer-events:none;z-index:300;transition:width .25s,height .25s,margin .25s,opacity .3s;opacity:0}
+#cur.big{width:46px;height:46px;margin:-23px 0 0 -23px}
+@media (pointer:coarse){#cur{display:none}}
+@media (prefers-reduced-motion:reduce){#intro{display:none!important}.rise,.rise-sm,.hero h1 .w>span{animation:none!important;transform:none!important;opacity:1!important;filter:none!important}#cur{display:none}}
 /* note */
 .notewrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
 @media(max-width:1100px){.notewrap{grid-template-columns:1fr}}
@@ -211,6 +247,15 @@ th.sel,td.sel{background-image:linear-gradient(var(--acc2),var(--acc2))}
 </style>
 </head>
 <body>
+<div id="intro" aria-hidden="true">
+ <div class="i-bg"></div><div class="i-vig"></div><div class="i-grain"></div>
+ <div class="i-top"><span>Hair Colour Pulse</span><span>Canada · Mass</span></div>
+ <div class="i-word"><span class="ln">Hair</span><span class="ln">Colour</span><span class="ln alt">Pulse</span></div>
+ <div class="i-count" id="icount">000</div>
+ <div class="i-meta">Category intelligence<span>NielsenIQ × Consumer U&amp;A</span></div>
+ <div class="i-bar"><i id="ibar"></i></div>
+</div>
+<div id="cur" aria-hidden="true"></div>
 <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
 <header class="glass"><div class="bar">
   <button class="brand" id="home" title="Home — upload or replace files" aria-label="Home"><i></i>Hair Colour Pulse</button>
@@ -1091,6 +1136,27 @@ function renderNote(){$('app').innerHTML=`<div class="notewrap"><div><div class=
  const rows=[['Mass HC','MASS'],['CPD','CPD'],["L'Oréal Paris",'L OREAL PARIS'],['Garnier','GARNIER'],['Wella (Clairol)','WELLA'],['Henkel','HENKEL'],['Rest of Market','REST OF MARKET']].filter(r=>has(r[1])&&get(r[1]));
  $('score').innerHTML=`<table><thead><tr><th></th><th>$SHR</th><th>$ %</th><th>U %</th></tr></thead><tbody>${rows.map(([n,p])=>{const x=get(p);return`<tr><td>${n}</td><td>${f1(x.ds)}</td><td class="${cls(x.dp)}">${sp(x.dp)}</td><td class="${cls(x.up)}">${sp(x.up)}</td></tr>`}).join('')}</tbody></table>`}
 
+/* ===================== motion ===================== */
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function stagger(els,base=0,step=70,cls='rise'){[...els].forEach((el,i)=>{el.classList.remove('rise','rise-sm');void el.offsetWidth;el.style.setProperty('--d',(base+i*step)+'ms');el.classList.add(cls)})}
+function animateView(first){if(RM)return;const app=$('app');const kids=[...app.children];
+ const inner=[...app.querySelectorAll('.ins>*,.grid>*,.seglist>*,.g3>*')];
+ stagger(kids,first?120:0,first?110:60,first?'rise':'rise-sm');stagger(inner,first?260:60,first?90:40,first?'rise':'rise-sm');
+ const h1=app.querySelector('.hero h1');if(h1&&!h1.dataset.split){h1.dataset.split=1;let i=0;h1.innerHTML=h1.textContent.split(' ').map(w=>`<span class="w"><span style="--i:${i++}">${esc(w)}</span></span>`).join(' ');h1.style.setProperty('--d',(first?200:0)+'ms')}}
+function runIntro(){const el=$('intro');let seen=false;try{seen=sessionStorage.getItem('hcp.intro')==='1'}catch(e){}
+ if(!el)return Promise.resolve(false);if(RM||seen){el.remove();return Promise.resolve(false)}
+ try{sessionStorage.setItem('hcp.intro','1')}catch(e){}
+ el.querySelectorAll('.ln').forEach((ln,li)=>{ln.innerHTML=[...ln.textContent].map((c,i)=>`<span class="ch" style="--i:${li*4+i}">${c}</span>`).join('')});
+ return new Promise(res=>{const t0=performance.now(),D=1900;let done=false;const ease=t=>1-Math.pow(1-t,4);
+  const finish=()=>{if(done)return;done=true;$('icount').textContent='100';$('ibar').style.width='100%';el.classList.add('leaving');
+   setTimeout(()=>{el.classList.add('out');res(true)},380);setTimeout(()=>el.remove(),1500)};
+  const tick=t=>{if(done)return;const k=Math.min((t-t0)/D,1),v=Math.round(ease(k)*100);$('icount').textContent=String(v).padStart(3,'0');$('ibar').style.width=v+'%';k<1?requestAnimationFrame(tick):setTimeout(finish,250)};
+  requestAnimationFrame(tick);el.addEventListener('click',finish);addEventListener('keydown',finish,{once:true})})}
+function initCursor(){const c=$('cur');if(!c||RM||!matchMedia('(pointer:fine)').matches){c&&c.remove();return}
+ let x=-100,y=-100,cx=x,cy=y;addEventListener('pointermove',e=>{x=e.clientX;y=e.clientY;c.style.opacity=1;c.classList.toggle('big',!!e.target.closest('button,a,select,input,.chip,.tree,th.sortable,[role=button]'))},{passive:true});
+ document.addEventListener('pointerleave',()=>c.style.opacity=0);
+ (function loop(){cx+=(x-cx)*.22;cy+=(y-cy)*.22;c.style.transform=`translate(${cx}px,${cy}px)`;requestAnimationFrame(loop)})()}
+
 /* ===================== shell ===================== */
 function segInit(id,on){const s=$(id);if(!s)return;const t=s.querySelector('.thumb');const place=()=>{const b=s.querySelector('button.on');if(b&&t){t.style.left=b.offsetLeft+'px';t.style.width=b.offsetWidth+'px';t.style.opacity=1}else if(t)t.style.opacity=0};
  requestAnimationFrame(place);s.querySelectorAll('button').forEach(b=>b.onclick=()=>{if(b.disabled)return;s.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));place();on(b.dataset.v||b.dataset.t)})}
@@ -1115,8 +1181,8 @@ function renderHome(){const fmt=t=>t?new Date(t).toLocaleString('en-CA',{dateSty
  $('hkb').onclick=()=>{ST.tab='kb';render()}}
 function render(){MC.clear();CC.clear();document.querySelectorAll('#tabs button').forEach(b=>{b.classList.toggle('on',b.dataset.t===ST.tab);b.disabled=!ST.cube&&b.dataset.t!=='news'});
  segInit('tabs',t=>{ST.tab=t;LS.set('hcp.tab',t);render()});renderControls();kill();
- if(ST.tab==='home'||(!ST.cube&&!['kb','news'].includes(ST.tab)))return renderHome();
- ({hi:renderHighlights,ov:renderHighlights,deck:renderDeck,seg:renderSegments,br:renderBrands,mk:renderMarkets,cx:renderConsumer,news:renderNews,kb:renderKB,note:renderNote}[ST.tab]||renderHighlights)()}
+ if(ST.tab==='home'||(!ST.cube&&!['kb','news'].includes(ST.tab))){renderHome();animateView(render.first);render.first=false;return}
+ ({hi:renderHighlights,ov:renderHighlights,deck:renderDeck,seg:renderSegments,br:renderBrands,mk:renderMarkets,cx:renderConsumer,news:renderNews,kb:renderKB,note:renderNote}[ST.tab]||renderHighlights)();animateView(render.first);render.first=false}
 (async function init(){const u=LS.get('hcp.universe',null);if(u&&u.rows&&u.rows.length){ST.universe=u.rows;ST.uniFile=u.file}
  const ua=LS.get('hcp.ua',null);if(ua&&ua.facts)ST.ua=ua;
  const t=LS.get('hcp.theme',null);if(t)document.documentElement.dataset.theme=t;
@@ -1127,11 +1193,12 @@ function render(){MC.clear();CC.clear();document.querySelectorAll('#tabs button'
  addEventListener('drop',e=>{e.preventDefault();document.body.classList.remove('dragging');handleFiles(e.dataTransfer.files)});
  document.addEventListener('pointermove',e=>{const g=e.target.closest&&e.target.closest('.glass');if(!g)return;const r=g.getBoundingClientRect();g.style.setProperty('--mx',(e.clientX-r.left)+'px');g.style.setProperty('--my',(e.clientY-r.top)+'px')},{passive:true});
  addEventListener('resize',()=>document.querySelectorAll('.seg').forEach(s=>{const b=s.querySelector('button.on'),th=s.querySelector('.thumb');if(b&&th){th.style.left=b.offsetLeft+'px';th.style.width=b.offsetWidth+'px'}}));
- render();
+ initCursor();const introP=runIntro();render.first=true;$('app').style.visibility='hidden';document.querySelector('header').style.visibility='hidden';
+ introP.then(played=>{$('app').style.visibility='';const hd=document.querySelector('header');hd.style.visibility='';if(played&&!RM)stagger([hd],0,0,'rise')});
  if(location.protocol.startsWith('http')){fetch('news.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&Array.isArray(j.items)){ST.news=j;if(ST.tab==='news')render()}}).catch(()=>{});
   if(!ST.ua)fetch('ua/hair-colour-ua-2025.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&j.type==='hair-colour-ua'){ST.ua=j;if(['cx','note'].includes(ST.tab))render()}}).catch(()=>{})}
  const im=await idbGet('imgs');if(im)Object.assign(IMG,im);
- if(await restoreData()){toast('Restored '+ST.file);render()}else if(Object.keys(IMG).length)render()})();
+ const restored=await restoreData();await introP;if(restored)toast('Restored '+ST.file);render.first=true;render()})();
 </script>
 </body>
 </html>

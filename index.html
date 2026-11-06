@@ -129,6 +129,39 @@ th.sel,td.sel{background-image:linear-gradient(var(--acc2),var(--acc2))}
 .lv0 td:first-child{font-weight:700}.lv1 td:first-child{font-weight:600}
 .tree{cursor:pointer;display:inline-block;width:16px;color:var(--faint)}
 .wrap td:first-child{white-space:normal;min-width:200px}
+.btn.ico{width:36px;height:36px;padding:0;display:inline-grid;place-items:center;font-size:16px}
+/* highlights */
+.hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:0;overflow:hidden;margin-bottom:16px;min-height:250px}
+.hero .txt{padding:28px 30px;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.hero .eyebrow{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--acc)}
+.hero h1{font-size:clamp(24px,3vw,36px);line-height:1.08;letter-spacing:-.035em;margin:0}
+.hero .sub{color:var(--mut);font-size:14px;max-width:560px}
+.hero .kp{display:flex;gap:22px;flex-wrap:wrap;margin-top:6px}
+.hero .kp div{display:flex;flex-direction:column}.hero .kp b{font-size:22px;letter-spacing:-.03em}.hero .kp span{font-size:11px;color:var(--mut);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.hero .art{position:relative;min-height:220px}
+.hero .art img,.hero .art svg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.hero .art::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--glass) 0%,transparent 35%);pointer-events:none}
+@media(max-width:820px){.hero{grid-template-columns:1fr}.hero .art{min-height:170px;order:-1}.hero .art::after{background:linear-gradient(0deg,var(--glass),transparent 45%)}}
+.ins{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:1100px){.ins{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.ins{grid-template-columns:1fr}}
+.icard{display:flex;flex-direction:column;overflow:hidden;padding:0}
+.icard .pic{height:118px;position:relative;overflow:hidden;border-radius:22px 22px 0 0}
+.icard .pic img,.icard .pic svg{width:100%;height:100%;object-fit:cover;display:block}
+.icard .pic .badge{position:absolute;left:12px;top:12px}
+.icard .bd{padding:14px 18px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.icard .big{font-size:30px;font-weight:800;letter-spacing:-.04em;line-height:1}
+.icard h4{margin:0;font-size:15.5px;letter-spacing:-.02em;line-height:1.25}
+.icard .why{font-size:13px;color:var(--mut)}
+.icard .act{margin-top:auto;font-size:12.5px;font-weight:600;border-top:1px solid var(--grid);padding-top:9px}
+.icard .act::before{content:"→ ";color:var(--acc)}
+.tone{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;border-radius:99px;padding:4px 10px;background:var(--glass3);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.tone i{width:7px;height:7px;border-radius:50%;display:inline-block}
+.t-opp i{background:var(--pos)}.t-risk i{background:var(--neg)}.t-watch i{background:var(--warn)}
+.signals{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}
+.signals div{font-size:13px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.16);border:1px solid var(--bd2)}
+.gal{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.gal figure{margin:0;width:92px;text-align:center;font-size:10.5px;color:var(--mut)}
+.gal img{width:92px;height:64px;object-fit:cover;border-radius:12px;border:1px solid var(--bd);display:block;margin-bottom:3px}
 /* note */
 .notewrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
 @media(max-width:1100px){.notewrap{grid-template-columns:1fr}}
@@ -182,21 +215,20 @@ th.sel,td.sel{background-image:linear-gradient(var(--acc2),var(--acc2))}
 <header class="glass"><div class="bar">
   <button class="brand" id="home" title="Home — upload or replace files" aria-label="Home"><i></i>Hair Colour Pulse</button>
   <div class="seg" id="tabs" role="tablist"><div class="thumb"></div>
-    <button data-t="deck" class="on">Deck</button>
-    <button data-t="ov">Overview</button>
+    <button data-t="hi" class="on">Highlights</button>
+    <button data-t="deck">Deck</button>
     <button data-t="seg">Segments</button>
     <button data-t="br">Brands</button>
     <button data-t="mk">Markets</button>
     <button data-t="cx">Consumer</button>
     <button data-t="news">News</button>
-    <button data-t="kb">Knowledge</button>
     <button data-t="note">Monthly Note</button>
   </div>
   <div class="sp"></div>
   <div class="ctl" id="ctl"></div>
-  <input type="file" id="file" accept=".xlsx,.xls,.pdf,.json" multiple hidden>
+  <input type="file" id="file" accept=".xlsx,.xls,.pdf,.json,image/*" multiple hidden>
   <button class="btn pri" id="upl">Upload</button>
-  <button class="btn" id="theme" title="Toggle light / dark">Theme</button>
+  <button class="btn ico" id="theme" title="Toggle light / dark" aria-label="Toggle light or dark theme"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
 </div></header>
 <main id="app"></main>
 <div class="toast" id="toast" role="status"></div>
@@ -437,7 +469,7 @@ const fV=v=>isD()?'$'+big(v):big(v);
 const fC=v=>isD()?money(v):(fin(v)?(v<0?'-':'+')+big(Math.abs(v))+' u':'n/a');
 
 /* ===================== state ===================== */
-const ST={cube:null,prods:[],mkts:[],pers:[],nat:null,per:'m',mkt:null,label:'',file:'',tab:(t=>t==='home'?'deck':t)(LS.get('hcp.tab','deck')),meas:LS.get('hcp.meas','d'),universe:UNIVERSE0,uniFile:null,
+const ST={cube:null,prods:[],mkts:[],pers:[],nat:null,per:'m',mkt:null,label:'',file:'',tab:(t=>['home','ov','kb'].includes(t)?'hi':t)(LS.get('hcp.tab','hi')),meas:LS.get('hcp.meas','d'),universe:UNIVERSE0,uniFile:null,
  open:new Set(['MASS','CPD','WELLA','HENKEL','REST OF MARKET']),q:'',sort:{k:'v',dir:-1},mxMetric:'p',mxPlayers:null,deckView:'period',deckQ:'',deckAll:false,deckLayout:null,deckSeg:null,ua:null,news:NEWS0,newsTag:'All'};
 let KB={};
 function buildKB(){KB={};
@@ -500,6 +532,7 @@ function handleFiles(files){if(!files||!files.length)return;$('loading').classLi
  let pending=files.length;const msgs=[];
  const done=()=>{if(--pending===0){$('loading').classList.remove('on');toast(msgs.join(' · '));render()}};
  [...files].forEach(f=>{const rd=new FileReader();
+  if(/\.(jpe?g|png|webp|gif|avif)$/i.test(f.name)||/^image\//.test(f.type)){addImage(f).then(m=>{msgs.push(m);done()});return}
   if(/\.pdf$/i.test(f.name)){rd.onload=async ev=>{try{const pages=await pdfPages(ev.target.result);const ua=uaParse(pages,f.name);
     if(ua.facts.length<5)msgs.push(f.name+': no U&A findings recognised');else{ST.ua=ua;LS.set('hcp.ua',ua);msgs.push(`U&A report read · ${ua.facts.length} findings from ${pages.length} pages`)}}catch(e){console.error(e);msgs.push(f.name+': '+e.message)}done()};rd.readAsArrayBuffer(f);return}
   if(/\.json$/i.test(f.name)){rd.onload=ev=>{try{const j=JSON.parse(ev.target.result);
@@ -513,7 +546,7 @@ function handleFiles(files){if(!files||!files.length)return;$('loading').classLi
     if(parseLong(rows,acc)){longN++;continue}
     if(/by\s*period/i.test(sn)){deck=parseDeck(rows)||deck;continue}
     const U=parseUniverse(rows);if(U){ST.universe=U;ST.uniFile=f.name;LS.set('hcp.universe',{rows:U,file:f.name});used=true;msgs.push('Brand universe updated ('+U.length+' lines)')}}
-   if(longN){loadCube(acc,f.name);ST.savedAt=Date.now();if(ST.tab==='home')ST.tab='deck';used=true;msgs.push(`Loaded ${f.name} · ${longN} data sheet${longN>1?'s':''} · ${acc.prods.length} lines · ${Object.keys(acc.pers).length} periods`)}
+   if(longN){loadCube(acc,f.name);ST.savedAt=Date.now();if(ST.tab==='home')ST.tab='hi';used=true;msgs.push(`Loaded ${f.name} · ${longN} data sheet${longN>1?'s':''} · ${acc.prods.length} lines · ${Object.keys(acc.pers).length} periods`)}
    if(deck){if(deck.seg)ST.deckSeg=deck.seg;if(deck.layout)ST.deckLayout=deck.layout;buildKB();msgs.push('Deck layout & segment map read')}
    if(!used&&!deck)msgs.push(f.name+': layout not recognised');
    if(longN)saveData();
@@ -537,6 +570,28 @@ async function saveData(){try{const db=await idb();const tx=db.transaction('kv',
 async function restoreData(){try{const db=await idb();const v=await new Promise(r=>{const q=db.transaction('kv').objectStore('kv').get('data');q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)});
  if(v&&v.cube){ST.savedAt=v.saved;ST.deckLayout=v.deckLayout||null;ST.deckSeg=v.deckSeg||null;buildKB();loadCube(v,v.file);return true}}catch(e){}return false}
 async function clearData(){try{const db=await idb();db.transaction('kv','readwrite').objectStore('kv').delete('data')}catch(e){}ST.cube=null;ST.prods=[];render()}
+
+/* ===================== images ===================== */
+/* Approved brand photos are dropped on Home; matched to a brand/franchise by file name and kept only in this browser. */
+const IMG={};
+async function idbGet(k){try{const db=await idb();return await new Promise(r=>{const q=db.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)})}catch(e){return null}}
+async function idbPut(k,v){try{const db=await idb();db.transaction('kv','readwrite').objectStore('kv').put(v,k)}catch(e){}}
+function imgSlot(fname){const n=clean(fname.replace(/\.[a-z0-9]+$/i,'').replace(/[_\-.]+/g,' ')).replace(/L ?OREAL|LOREAL/,'L OREAL');
+ if(/\b(HERO|BANNER|COVER|HOME)\b/.test(n))return'hero';
+ const cands=[...new Set([...ST.prods,...Object.keys(KB),'L OREAL PARIS','GARNIER','CPD'])].filter(k=>/^[TMBFS]$/.test(kb(k).l)&&k.length>2);
+ const hit=cands.filter(k=>n.includes(k)).sort((a,b)=>b.length-a.length)[0];return hit||(IMG.hero?null:'hero')}
+function addImage(f){return new Promise(res=>{const rd=new FileReader();rd.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,1600/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+  const slot=imgSlot(f.name);if(!slot)return res(f.name+': no matching brand in file name');IMG[slot]=c.toDataURL('image/jpeg',.86);idbPut('imgs',IMG);res(`Image “${f.name}” → ${slot==='hero'?'banner':pretty(slot)}`)};im.onerror=()=>res(f.name+': not an image');im.src=rd.result};rd.readAsDataURL(f)})}
+function imgFor(p){if(p==='__hero')return IMG.hero||null;if(!p)return null;let c=p,g=0;while(c&&g++<8){if(IMG[c])return IMG[c];const e=kb(c);if(e.b&&IMG[e.b])return IMG[e.b];c=e.p}return null}
+function hash(s){let x=2166136261;for(const ch of String(s))x=Math.imul(x^ch.charCodeAt(0),16777619);return x>>>0}
+const SHADES={dark:['#1f1410','#3b2418','#5a3825','#7a4a2e'],warm:['#6b3a22','#9a5a34','#c07a45','#e0a368'],blonde:['#b8875a','#d6aa72','#ead09b','#f6e6c2'],red:['#5e1820','#8f2430','#c0392b','#e06b4f'],bold:['#4b1f6f','#8e2c8f','#e0457b','#3fa7d6'],cool:['#2a2f45','#4b5578','#8590b5','#c9cfe6']};
+function strandArt(seed,mood){const r=hash(seed);const rnd=i=>{const v=Math.sin(r*0.0001+i*12.9898)*43758.5453;return v-Math.floor(v)};
+ const pal=SHADES[mood]||SHADES[['dark','warm','blonde','red','bold','cool'][r%6]];const id='g'+r.toString(36);
+ let defs='',paths='';for(let i=0;i<14;i++){const c1=pal[i%pal.length],c2=pal[(i+1+Math.floor(rnd(i)*3))%pal.length];defs+=`<linearGradient id="${id}${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>`;
+  const y=-40+i*24+rnd(i+1)*20,w=16+rnd(i+2)*26,a=60+rnd(i+3)*120;paths+=`<path d="M-40 ${y} C 120 ${y-a}, 260 ${y+a}, 460 ${y+20-rnd(i+4)*60}" stroke="url(#${id}${i})" stroke-width="${w.toFixed(1)}" fill="none" stroke-linecap="round" opacity="${(.55+rnd(i+5)*.45).toFixed(2)}"/>`}
+ return`<svg viewBox="0 0 420 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs>${defs}<filter id="${id}b"><feGaussianBlur stdDeviation="1.2"/></filter><linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><rect width="420" height="260" fill="${pal[0]}"/><g filter="url(#${id}b)">${paths}</g><rect width="420" height="260" fill="url(#${id}s)"/></svg>`}
+const moodOf=p=>{const s=p&&segOf(p);return s==='BOLDS'||s==='BLEACH'?'bold':s==='ROOTS'?'cool':s==='AFG'?'warm':p&&/BLOND|BLEACH|LIGHT/.test(p)?'blonde':p&&/RED|FERIA/.test(p)?'red':null};
+const visual=(p,seed)=>{const u=imgFor(p);return u?`<img src="${u}" alt="${esc(p?pretty(p):'Hair colour')}">`:strandArt(seed||p||'hero',moodOf(p))};
 
 /* ===================== metrics ===================== */
 function gv(p,m,k,f){return ST.cube?.[p]?.[m]?.[k]?.[f]}
@@ -691,6 +746,66 @@ function renderOverview(){kill();chartBase();const M=get('MASS');if(!M)return;co
  $('segbars').innerHTML=sg.map(([s,x])=>`<div class="row"><div>${s.name}</div><div class="track"><div class="fill" style="width:${x.s/mx*100}%;background:${x.p>=Mm.p?'var(--pos)':'var(--neg)'};opacity:.6"></div></div><div class="${cls(x.p)}" style="text-align:right">${f1(x.s)}% · ${sp(x.p)}</div></div>`).join('')+`<div class="hint">Bar = WOB; green = growing ≥ category (${sp(Mm.p)}).</div>`;
  if($('c4')){const hk=[...ST.pers.filter(p=>p.k[0]==='c').map(p=>p.k).sort(),...['y','q','m'].filter(k=>ST.pers.some(p=>p.k===k))];const tp=['CPD','L OREAL PARIS','GARNIER','WELLA','HENKEL','REST OF MARKET'].filter(has);
   charts.c4=new Chart($('c4'),{type:'line',data:{labels:hk.map(perShort),datasets:tp.map((p,i)=>({label:pretty(p),data:hk.map(k=>mv(get(p,ST.mkt,k)).s??null),borderColor:PAL[i],backgroundColor:PAL[i],tension:.3,spanGaps:true}))},options:{maintainAspectRatio:false,plugins:{legend:{labels:{boxWidth:10}}},scales:{y:{ticks:{callback:v=>v+'%'}}}}})}}
+
+/* ===================== HIGHLIGHTS ===================== */
+function insights(){const k=ST.per,M=get('MASS');if(!M||!M.hasYA)return[];const Mm=mv(M);const out=[];const L=k==='m'?ST.label:perShort(k);
+ const cpd=get('CPD'),Cm=mv(cpd);const fs=franchiseSet();
+ /* 1 category */
+ const mix=fin(M.dp)&&fin(M.up)?M.dp-M.up:0;
+ out.push({tone:Mm.p>=0?'opp':'risk',tag:'Category',big:sp(Mm.p),p:null,seed:'cat'+L,title:`Mass Hair Colour ${Mm.p>=0?'is growing':'is declining'} in ${L}`,
+  why:`${ML()} ${fV(Mm.v)} (${fC(Mm.c)}); ${isD()?'units':'$'} ${sp(Mm.op)}; avg $/unit ${sp(M.prp)}.`,
+  act:Math.abs(mix)<1.5?'Growth is volume-led — keep availability and in-store visibility strong.':mix>0?'Growth is price/mix-led — watch unit elasticity before the next price move.':'Units outpace $ — shoppers are trading down; protect value packs and entry price points.'});
+ /* 2 CPD share */
+ if(cpd&&fin(Cm.sc)){const mm=ST.mkts.filter(m=>m!==ST.nat&&get('MASS',m)&&get('MASS',m).d>=get('MASS',ST.nat).d*0.03&&get('CPD',m)&&mgroup(m)!=='3 Regions'&&mgroup(m)!=='4 SDM regions');
+  const sh=mm.map(m=>[m,mv(get('CPD',m)).sc]).filter(a=>fin(a[1])).sort((a,b)=>a[1]-b[1]);const lo=sh[0],hi=sh[sh.length-1];
+  out.push({tone:Cm.sc>=0.05?'opp':Cm.sc<=-0.05?'risk':'watch',tag:'CPD share',big:spp(Cm.sc),p:'CPD',seed:'cpd'+L,title:`CPD ${Cm.sc>=0?'gained':'lost'} share — now ${f1(Cm.s)}%`,
+   why:`${ML()} ${sp(Cm.p)} vs category ${sp(Mm.p)}.${hi&&hi[1]>0?` Strongest in ${mshort(hi[0])} (${spp(hi[1])})`:''}${lo&&lo[1]<0?`, weakest in ${mshort(lo[0])} (${spp(lo[1])}).`:'.'}`,
+   act:lo&&lo[1]<0?`Prioritise ${mshort(lo[0])}: review promo calendar, shelf and out-of-stocks.`:'Share is improving across key accounts — keep investment behind the winners.'})}
+ /* 3 biggest CPD win, 4 biggest CPD drag */
+ const cf=fs.filter(isCPD).map(p=>[p,contrib(p,'fr')]).filter(a=>a[1]);
+ const w=rankBy(cf.filter(a=>a[1].t==='G'),a=>a[1].v)[0],d=rankBy(cf.filter(a=>a[1].t==='L'),a=>a[1].v)[0];
+ if(w){const x=get(w[0]),m=mv(x);out.push({tone:'opp',tag:'CPD winner',big:ctxt(w[1]),p:w[0],title:`${fullName(w[0])} is driving CPD growth`,why:`${fC(m.c)} · ${x.isNew?'new launch':ML()+' '+sp(m.p)} · ${SL()} ${f1(m.s)} (${spp(m.sc)}).`,act:x.launch?'New launch winning — secure distribution gains and keep it visible in-store and online.':'Protect momentum: distribution, visibility and support behind it.'})}
+ if(d){const x=get(d[0]),m=mv(x);out.push({tone:'risk',tag:'CPD drag',big:ctxt(d[1]),p:d[0],title:`${fullName(d[0])} is the biggest CPD drag`,why:`${fC(m.c)} · ${ML()} ${sp(m.p)} · ${SL()} ${f1(m.s)} (${spp(m.sc)}).`,act:x.delist?'Being delisted — make sure shoppers move to the replacement SKU.':'Review price, promo and shade range; check where shoppers are switching to.'})}
+ /* 5 consumer need / segment outgrowing the category */
+ const sg=SEGS.filter(s=>has(s.row)&&['GREY','BOLDS','ROOTS','AFG','BLEACH','AFR'].includes(s.k)).map(s=>[s,get(s.row)]).filter(a=>a[1]&&fin(mv(a[1]).p)&&a[1].ds>=3);
+ const best=rankBy(sg,a=>mv(a[1]).p-Mm.p)[0];
+ if(best){const[s,x]=best;const m=mv(x);const top=topBy(segCands(s.k).map(p=>[p,get(p)]).filter(a=>a[1]),a=>mv(a[1]).c);
+  const theme={AFG:'gentle',AFR:'gentle',ROOTS:'roots',GREY:'grey',BOLDS:'fun',BLEACH:'fun'}[s.k];const fact=ST.ua&&ST.ua.facts.find(f=>f.k===theme&&f.stat);
+  out.push({tone:m.p>Mm.p?'opp':'watch',tag:'Consumer need',big:sp(m.p),p:top?top[0]:null,seed:s.k,title:`${s.name} is ${m.p>Mm.p?'outgrowing':'tracking'} the category`,
+   why:`${f1(x.ds)}% of the category, ${ML()} ${sp(m.p)} vs ${sp(Mm.p)}${top?`; led by ${fullName(top[0])}`:''}.${fact?` U&A: ${fact.stat} ${fact.label.replace(/\.$/,'')}.`:''}`,
+   act:theme==='gentle'?'Lead with care credentials (no ammonia, fewer chemicals) on pack and online.':theme==='roots'?'Win the in-between occasion with quick root fixes next to permanent colour.':'Back the segment winners rather than broad range extensions.'})}
+ /* 6 competitor threat */
+ const comp=brandSet().filter(b=>!isCPD(b)&&b!=='HENKEL'&&b!=='CLAIROL');const cc=comp.map(b=>[b,contrib(b,'brand')]).filter(a=>a[1]&&a[1].t==='G');const th=rankBy(cc,a=>a[1].v)[0];
+ if(th){const x=get(th[0]),m=mv(x);let ch='';if(ST.mkt===ST.nat&&mE()&&mB()){const e=get(th[0],mE()),b=get(th[0],mB());if(e&&b)ch=` E-Com ${sp(mv(e).p)} vs B&M ${sp(mv(b).p)}.`}
+  out.push({tone:'risk',tag:'Competitor',big:ctxt(th[1]),p:th[0],title:`${pretty(th[0])} is taking the most growth`,why:`${ML()} ${sp(m.p)} · ${SL()} ${f1(m.s)} (${spp(m.sc)}).${ch}`,act:'Understand the driver (launch, price, distribution) and defend the overlapping CPD franchise.'})}
+ return out}
+function signals(){const M=get('MASS');if(!M||!M.hasYA)return[];const s=[];
+ let launches=lineItems().filter(p=>get(p)?.launch&&(get(p).ds>=0.05||Math.abs(get(p).dc)>=10000));const ls=launches.reduce((a,p)=>a+get(p).d,0)/M.d*100;
+ if(launches.length)s.push(`<b>Innovation:</b> ${launches.length} launch lines = ${f1(ls)}% of category $.`);
+ if(mE()){const e=get('MASS',mE());if(e?.hasYA)s.push(`<b>E-commerce:</b> $ ${C(e.dp,sp(e.dp))} vs B&M ${mB()?C(get('MASS',mB()).dp,sp(get('MASS',mB()).dp)):'n/a'} — ${f1(e.d/get('MASS',ST.nat).d*100)}% of tracked $.`)}
+ const lose=SEGS.filter(x=>x.main&&has(x.row)).map(x=>[x,get(x.row)]).filter(a=>a[1]&&a[1].dp<M.dp).sort((a,b)=>a[1].dp-b[1].dp)[0];
+ if(lose)s.push(`<b>Lagging segment:</b> ${lose[0].name} $ ${C(lose[1].dp,sp(lose[1].dp))} (${f1(lose[1].ds)}% WOB).`);
+ const R=get('REST OF MARKET');if(R?.hasYA)s.push(`<b>Rest of market:</b> $ ${C(R.dp,sp(R.dp))}, share ${spp(R.dsc)} — ${R.dp>M.dp?'smaller brands outgrowing the big three':'big three holding'}.`);
+ return s}
+function renderHighlights(){kill();chartBase();const M=get('MASS');if(!M)return;const Mm=mv(M),cpd=get('CPD'),Cm=mv(cpd);const L=ST.per==='m'?ST.label:perShort(ST.per);const ins=insights();
+ const T={opp:['Opportunity','t-opp'],risk:['Risk','t-risk'],watch:['Watch','t-watch']};
+ $('app').innerHTML=`<section class="glass hero"><div class="txt"><div class="eyebrow">${esc(L)} · ${esc(mlabel(ST.mkt))}</div>
+  <h1>${M.hasYA?`Mass Hair Colour ${Mm.p>=0?'up':'down'} ${sp(Mm.p).replace(/^[+-]/,'')}${cpd&&fin(Cm.sc)?`, CPD ${Cm.sc>=0?'gaining':'losing'} share`:''}`:'Hair colour market snapshot'}</h1>
+  <div class="sub">${esc(perLabel(ST.per))} · NielsenIQ${ST.ua?' · consumer lens: '+esc(ST.ua.title):''}</div>
+  <div class="kp"><div><b>${fV(Mm.v)}</b><span>Mass ${ML()}</span></div><div><b class="${cls(Mm.p)}">${sp(Mm.p)}</b><span>vs year ago</span></div>${cpd?`<div><b>${f1(Cm.s)}%</b><span>CPD ${SL()}</span></div><div><b class="${cls(Cm.sc)}">${spp(Cm.sc)}</b><span>CPD share chg</span></div>`:''}</div></div>
+  <div class="art">${visual('__hero','hero-'+L)}</div></section>
+ ${ins.length?`<div class="ins">${ins.map(i=>`<article class="glass icard"><div class="pic">${visual(i.p,i.seed)}<span class="badge tone ${T[i.tone][1]}"><i></i>${T[i.tone][0]} · ${esc(i.tag)}</span></div>
+  <div class="bd"><div class="big ${i.tone==='risk'?'neg':i.tone==='opp'?'pos':'warn'}">${esc(i.big)}</div><h4>${esc(i.title)}</h4><div class="why">${esc(i.why)}</div><div class="act">${esc(i.act)}</div></div></article>`).join('')}</div>`:`<div class="glass pad">No year-ago data for this period — pick ${esc(ST.label)}, L13W or YTD to see insights.</div>`}
+ ${signals().length?`<div class="glass pad" style="margin-top:14px"><h3>Other signals</h3><div class="signals">${signals().map(s=>`<div>${s}</div>`).join('')}</div></div>`:''}
+ ${M.hasYA?`<div class="grid g2" style="margin-top:14px"><div class="glass pad"><h3>Who is driving growth — and loss</h3><div class="hint" style="margin:-4px 0 6px">Share of total absolute ${ML()} gains (right) and losses (left) by franchise · blue = CPD</div><div class="chartbox" style="height:380px"><canvas id="h1"></canvas></div></div>
+  <div class="glass pad"><h3>Segments vs category</h3><div id="hsegs" class="bars"></div><h3 style="margin-top:18px">Where CPD is gaining / losing share</h3><div id="hmk" class="bars"></div></div></div>`:''}`;
+ if(!M.hasYA)return;
+ const fsx=franchiseSet().map(p=>[p,contrib(p,'fr')]).filter(a=>a[1]);const g=rankBy(fsx.filter(a=>a[1].t==='G'),a=>a[1].v).slice(0,6),l=rankBy(fsx.filter(a=>a[1].t==='L'),a=>a[1].v).slice(0,6);const arr=[...g,...l.reverse()];
+ charts.h1=new Chart($('h1'),{type:'bar',data:{labels:arr.map(a=>fullName(a[0])),datasets:[{data:arr.map(a=>a[1].t==='G'?a[1].v:-a[1].v),backgroundColor:arr.map(a=>isCPD(a[0])?(a[1].t==='G'?'#2456e6':'#86a2f7'):(a[1].t==='G'?'#10b981':'#ef4444')),borderRadius:6}]},options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const a=arr[c.dataIndex];return`${ctxt(a[1])} · ${fC(mv(get(a[0])).c)}`}}}},scales:{x:{ticks:{callback:v=>Math.abs(v)+'%'}}}}});
+ const sg=SEGS.filter(s=>s.main&&has(s.row)).map(s=>[s,mv(get(s.row))]).filter(a=>fin(a[1].p));const mx=Math.max(...sg.map(a=>Math.abs(a[1].p)),1);
+ $('hsegs').innerHTML=sg.map(([s,x])=>`<div class="row"><div>${s.name}</div><div class="track"><div class="fill" style="width:${Math.abs(x.p)/mx*100}%;background:${x.p>=Mm.p?'var(--pos)':'var(--neg)'};opacity:.65"></div></div><div class="${cls(x.p)}" style="text-align:right">${sp(x.p)}</div></div>`).join('')+`<div class="hint">Green = growing ≥ category (${sp(Mm.p)})</div>`;
+ const mm=ST.mkts.filter(m=>m!==ST.nat&&get('CPD',m)&&get('MASS',m)&&get('MASS',m).d>=get('MASS',ST.nat).d*0.03&&['1 Channels','2 Banners & divisions'].includes(mgroup(m))).map(m=>[m,mv(get('CPD',m)).sc]).filter(a=>fin(a[1])).sort((a,b)=>b[1]-a[1]);const mx2=Math.max(...mm.map(a=>Math.abs(a[1])),.1);
+ $('hmk').innerHTML=mm.map(([m,v])=>`<div class="row"><div>${esc(mshort(m))}</div><div class="track"><div class="fill" style="width:${Math.abs(v)/mx2*100}%;background:${v>=0?'var(--pos)':'var(--neg)'};opacity:.65"></div></div><div class="${cls(v)}" style="text-align:right">${spp(v)}</div></div>`).join('')}
 
 /* ===================== SEGMENTS ===================== */
 function renderSegments(){const M=get('MASS'),Mm=mv(M);const subs=ST.prods.filter(p=>kb(p).l==='X'||kb(p).l==='XM');
@@ -981,17 +1096,20 @@ function renderControls(){if(!ST.cube){$('ctl').innerHTML='';return}
 function renderHome(){const fmt=t=>t?new Date(t).toLocaleString('en-CA',{dateStyle:'medium',timeStyle:'short'}):'';
  $('app').innerHTML=`<div class="glass drop"><b>${ST.cube?'Upload new files':'Upload the Nielsen Deck and the U&A report'}</b><div class="mut">Nielsen Deck (.xlsx) and U&A report (.pdf) — read entirely in your browser, nothing leaves your computer.</div>
  <div class="ctl" style="justify-content:center;margin-top:18px"><button class="btn pri" id="hpick">Choose file(s)</button>${ST.cube?'<button class="btn" id="hopen">Open dashboard →</button>':''}</div>
- <div class="files"><span class="tag ${ST.cube?'ok':'no'}">Nielsen data — ${ST.cube?esc(ST.file)+(ST.savedAt?' · '+esc(fmt(ST.savedAt)):''):'not loaded'}</span><span class="tag ${ST.ua?'ok':'no'}">Consumer U&A — ${ST.ua?esc(ST.ua.title):'upload the report PDF'}</span><span class="tag ${ST.uniFile?'ok':'no'}">Brand universe — ${ST.uniFile?esc(ST.uniFile):'names built in'}</span></div>
- ${ST.cube||ST.ua?`<div class="ctl" style="justify-content:center;margin-top:12px">${ST.cube?'<button class="btn sm" id="hclr">Clear Nielsen data</button>':''}${ST.ua?'<button class="btn sm" id="hua">Remove U&A</button>':''}</div>`:''}
- <div class="hint" style="max-width:660px;margin:18px auto 0">Drop several files at once: a new Nielsen Deck workbook (or TL MASS HC file) replaces the current data and drives every tab; the U&A report PDF adds the consumer lens; the BRAND / SUB BRAND / $ table sizes the universe. Everything is remembered in this browser for next time.</div></div>`;
+ <div class="files"><span class="tag ${ST.cube?'ok':'no'}">Nielsen data — ${ST.cube?esc(ST.file)+(ST.savedAt?' · '+esc(fmt(ST.savedAt)):''):'not loaded'}</span><span class="tag ${ST.ua?'ok':'no'}">Consumer U&A — ${ST.ua?esc(ST.ua.title):'upload the report PDF'}</span><span class="tag ${ST.uniFile?'ok':'no'}">Brand universe — ${ST.uniFile?esc(ST.uniFile):'names built in'}</span><span class="tag ${Object.keys(IMG).length?'ok':'no'}">Photos — ${Object.keys(IMG).length?Object.keys(IMG).length+' added':'optional'}</span></div>
+ <div class="ctl" style="justify-content:center;margin-top:12px">${ST.cube?'<button class="btn sm" id="hclr">Clear Nielsen data</button>':''}${ST.ua?'<button class="btn sm" id="hua">Remove U&A</button>':''}${Object.keys(IMG).length?'<button class="btn sm" id="himg">Remove images</button>':''}<button class="btn sm" id="hkb">Knowledge base</button></div>
+ ${Object.keys(IMG).length?`<div class="gal">${Object.entries(IMG).map(([k,u])=>`<figure><img src="${u}" alt=""><figcaption>${esc(k==='hero'?'Banner':pretty(k))}</figcaption></figure>`).join('')}</div>`:''}
+ <div class="hint" style="max-width:660px;margin:18px auto 0">Drop several files at once: a new Nielsen Deck workbook (or TL MASS HC file) replaces the current data and drives every tab; the U&A report PDF adds the consumer lens; the BRAND / SUB BRAND / $ table sizes the universe. <b>Photos:</b> drop approved brand images (.jpg/.png) named after the brand or franchise — e.g. <i>casting.jpg</i>, <i>garnier.png</i>, <i>hero.jpg</i> for the banner — and they appear on the Highlights cards. Everything stays in this browser.</div></div>`;
  $('hpick').onclick=()=>$('file').click();
- if($('hopen'))$('hopen').onclick=()=>{ST.tab=LS.get('hcp.tab','deck');if(ST.tab==='home')ST.tab='deck';render()};
+ if($('hopen'))$('hopen').onclick=()=>{ST.tab=LS.get('hcp.tab','hi');if(['home','kb','ov'].includes(ST.tab))ST.tab='hi';render()};
  if($('hclr'))$('hclr').onclick=()=>{if(confirm('Clear the loaded Nielsen data from this browser?'))clearData()};
- if($('hua'))$('hua').onclick=()=>{ST.ua=null;LS.set('hcp.ua',null);render()}}
-function render(){MC.clear();CC.clear();document.querySelectorAll('#tabs button').forEach(b=>{b.classList.toggle('on',b.dataset.t===ST.tab);b.disabled=!ST.cube&&!['kb','news'].includes(b.dataset.t)});
+ if($('hua'))$('hua').onclick=()=>{ST.ua=null;LS.set('hcp.ua',null);render()};
+ if($('himg'))$('himg').onclick=()=>{for(const k in IMG)delete IMG[k];idbPut('imgs',{});render()};
+ $('hkb').onclick=()=>{ST.tab='kb';render()}}
+function render(){MC.clear();CC.clear();document.querySelectorAll('#tabs button').forEach(b=>{b.classList.toggle('on',b.dataset.t===ST.tab);b.disabled=!ST.cube&&b.dataset.t!=='news'});
  segInit('tabs',t=>{ST.tab=t;LS.set('hcp.tab',t);render()});renderControls();kill();
  if(ST.tab==='home'||(!ST.cube&&!['kb','news'].includes(ST.tab)))return renderHome();
- ({deck:renderDeck,ov:renderOverview,seg:renderSegments,br:renderBrands,mk:renderMarkets,cx:renderConsumer,news:renderNews,kb:renderKB,note:renderNote}[ST.tab]||renderDeck)()}
+ ({hi:renderHighlights,ov:renderHighlights,deck:renderDeck,seg:renderSegments,br:renderBrands,mk:renderMarkets,cx:renderConsumer,news:renderNews,kb:renderKB,note:renderNote}[ST.tab]||renderHighlights)()}
 (async function init(){const u=LS.get('hcp.universe',null);if(u&&u.rows&&u.rows.length){ST.universe=u.rows;ST.uniFile=u.file}
  const ua=LS.get('hcp.ua',null);if(ua&&ua.facts)ST.ua=ua;
  const t=LS.get('hcp.theme',null);if(t)document.documentElement.dataset.theme=t;
@@ -1005,7 +1123,8 @@ function render(){MC.clear();CC.clear();document.querySelectorAll('#tabs button'
  render();
  if(location.protocol.startsWith('http')){fetch('news.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&Array.isArray(j.items)){ST.news=j;if(ST.tab==='news')render()}}).catch(()=>{});
   if(!ST.ua)fetch('ua/hair-colour-ua-2025.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&j.type==='hair-colour-ua'){ST.ua=j;if(['cx','note'].includes(ST.tab))render()}}).catch(()=>{})}
- if(await restoreData()){toast('Restored '+ST.file);render()}})();
+ const im=await idbGet('imgs');if(im)Object.assign(IMG,im);
+ if(await restoreData()){toast('Restored '+ST.file);render()}else if(Object.keys(IMG).length)render()})();
 </script>
 </body>
 </html>

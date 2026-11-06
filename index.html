@@ -3,370 +3,742 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hair Colour · Nielsen</title>
+<title>Hair Colour Pulse</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
-:root{--bg1:#e6ecff;--bg2:#fde8f4;--bg3:#e2f7f0;--glass:rgba(255,255,255,.50);--glass2:rgba(255,255,255,.72);--bd:rgba(255,255,255,.7);--hi:rgba(255,255,255,.9);--txt:#1d1d1f;--mut:#6e6e73;--pos:#1fa24a;--neg:#e5303f;--warn:#c77700;--acc:#0071e3;--sh:0 12px 40px rgba(31,38,80,.12);--stick:rgba(244,246,253,.94);--grid:rgba(0,0,0,.07);--blob:.75}
-[data-theme=dark]{--bg1:#090b18;--bg2:#190e24;--bg3:#06151a;--glass:rgba(44,46,64,.42);--glass2:rgba(70,72,94,.55);--bd:rgba(255,255,255,.13);--hi:rgba(255,255,255,.25);--txt:#f5f5f7;--mut:#a1a1a6;--pos:#32d74b;--neg:#ff453a;--warn:#ffb340;--acc:#0a84ff;--sh:0 12px 40px rgba(0,0,0,.5);--stick:rgba(30,32,48,.95);--grid:rgba(255,255,255,.08);--blob:.45}
+:root{--bg:#f4f5f9;--bg2:#eef0f7;--card:#ffffff;--card2:#f7f8fb;--bd:#e3e5ee;--txt:#15161a;--mut:#6b6f7b;--faint:#9a9eab;--pos:#16833c;--neg:#d12c3a;--warn:#b36b00;--acc:#2b59e6;--acc2:#e9eefe;--cpd:#2b59e6;--sh:0 1px 2px rgba(20,22,40,.05),0 6px 24px rgba(20,22,40,.06);--grid:rgba(0,0,0,.07);--posbg:rgba(22,131,60,.10);--negbg:rgba(209,44,58,.10);--paper:#ffffff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0f13;--bg2:#14161c;--card:#181a21;--card2:#1e2129;--bd:#2a2d37;--txt:#eef0f4;--mut:#a0a4b0;--faint:#70747f;--pos:#3ccf6e;--neg:#ff5d68;--warn:#ffb340;--acc:#6f8fff;--acc2:#1f2846;--cpd:#6f8fff;--sh:0 1px 2px rgba(0,0,0,.4),0 8px 30px rgba(0,0,0,.35);--grid:rgba(255,255,255,.08);--posbg:rgba(60,207,110,.13);--negbg:rgba(255,93,104,.13);--paper:#1b1d24}}
+:root[data-theme="dark"]{--bg:#0e0f13;--bg2:#14161c;--card:#181a21;--card2:#1e2129;--bd:#2a2d37;--txt:#eef0f4;--mut:#a0a4b0;--faint:#70747f;--pos:#3ccf6e;--neg:#ff5d68;--warn:#ffb340;--acc:#6f8fff;--acc2:#1f2846;--cpd:#6f8fff;--sh:0 1px 2px rgba(0,0,0,.4),0 8px 30px rgba(0,0,0,.35);--grid:rgba(255,255,255,.08);--posbg:rgba(60,207,110,.13);--negbg:rgba(255,93,104,.13);--paper:#1b1d24}
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;min-height:100vh;color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Inter,"Segoe UI",system-ui,sans-serif;font-size:14px;letter-spacing:-.011em;font-variant-numeric:tabular-nums;background:linear-gradient(135deg,var(--bg1),var(--bg2) 55%,var(--bg3));background-attachment:fixed;-webkit-font-smoothing:antialiased}
-.blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:var(--blob);z-index:-1;animation:drift 24s ease-in-out infinite alternate}
-.b1{width:46vw;height:46vw;background:#6f9bff;top:-12vw;left:-10vw}
-.b2{width:40vw;height:40vw;background:#ff8fd0;bottom:-14vw;right:-8vw;animation-duration:30s}
-.b3{width:32vw;height:32vw;background:#5fe3bd;top:35vh;left:42vw;animation-duration:36s}
-@keyframes drift{to{transform:translate(8vw,6vh) scale(1.2)}}
-.glass{position:relative;background:var(--glass);backdrop-filter:blur(28px) saturate(190%);-webkit-backdrop-filter:blur(28px) saturate(190%);border:1px solid var(--bd);border-radius:24px;box-shadow:var(--sh),inset 0 1px 0 var(--hi),inset 0 -1px 0 rgba(255,255,255,.06);overflow:hidden}
-.glass::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(420px circle at var(--mx,50%) var(--my,-30%),rgba(255,255,255,.26),transparent 60%)}
-nav{position:sticky;top:14px;z-index:20;margin:14px auto 0;width:max-content;max-width:calc(100% - 24px);display:flex;gap:10px;align-items:center;padding:7px 8px;border-radius:99px;flex-wrap:wrap;justify-content:center}
-.seg{position:relative;display:flex;padding:3px;border-radius:99px;background:rgba(120,120,140,.14)}
-.seg button{position:relative;z-index:1;background:none;border:0;padding:7px 18px;border-radius:99px;font-weight:600;color:var(--mut);transition:color .25s;cursor:pointer}
-.seg button.on{color:var(--txt)}
-.thumb{position:absolute;top:3px;bottom:3px;border-radius:99px;background:var(--glass2);box-shadow:0 2px 10px rgba(0,0,0,.12),inset 0 1px 0 var(--hi);transition:left .4s cubic-bezier(.3,1.3,.5,1),width .4s cubic-bezier(.3,1.3,.5,1)}
-button,select,input,textarea{font:inherit;color:var(--txt)}
-.btn{border:1px solid var(--bd);background:var(--glass2);border-radius:99px;padding:8px 16px;font-weight:600;cursor:pointer;transition:transform .2s,box-shadow .2s}
-.btn:hover{transform:translateY(-1px) scale(1.03);box-shadow:0 6px 18px rgba(0,0,0,.12)}.btn:active{transform:scale(.97)}
-.btn.pri{background:var(--acc);color:#fff;border-color:transparent;box-shadow:0 6px 18px rgba(0,113,227,.4)}
-.ico{width:36px;height:36px;padding:0;display:grid;place-items:center}
-main{max-width:1700px;margin:0 auto;padding:26px 22px 60px}
-.hero{margin:8px 4px 20px}
-.hero h1{margin:0;font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-.03em;line-height:1.05}
-.hero p{margin:6px 0 0;color:var(--mut);font-size:15px}
-.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
-.filters .t{font-size:12px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
-select,input[type=search],input[type=number],input:not([type]){border:1px solid var(--bd);background:var(--glass2);backdrop-filter:blur(14px);border-radius:99px;padding:8px 14px;outline:none}
-select:focus,input:focus{box-shadow:0 0 0 3px rgba(0,113,227,.35)}
-.chk{display:flex;gap:6px;align-items:center;background:var(--glass2);border:1px solid var(--bd);border-radius:99px;padding:7px 14px;cursor:pointer;font-weight:500}
-.yel{background:#ffe14d;color:#111;font-weight:700;border-radius:99px;padding:7px 16px;box-shadow:0 4px 14px rgba(255,225,77,.45)}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.chip{border:1px solid var(--bd);background:var(--glass2);border-radius:99px;padding:6px 12px;cursor:pointer;font-size:12px;transition:transform .2s}
-.chip:hover{transform:translateY(-2px)}.chip.on{outline:2px solid var(--acc)}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:18px}
-.kpi{padding:20px 22px}
-.kpi .n{font-size:12px;color:var(--mut);font-weight:700;letter-spacing:.07em;text-transform:uppercase}
-.kpi .v{font-size:46px;font-weight:700;letter-spacing:-.04em;line-height:1.1;margin:6px 0 2px}
-.kpi .c{font-weight:600}.kpi .r{margin-top:12px;font-size:12px;color:var(--mut)}
-.pos{color:var(--pos)}.neg{color:var(--neg)}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
-@media(max-width:1000px){.g2{grid-template-columns:1fr}}
-.panel{padding:20px 22px}
-.panel h3{margin:0 0 12px;font-size:19px;font-weight:700;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
-.cnt{font-size:12px;font-weight:700;background:rgba(120,120,140,.2);border-radius:99px;padding:2px 9px;color:var(--mut)}
-.flag{display:flex;gap:12px;align-items:center;padding:11px 12px;margin:0 -12px;border-radius:16px;transition:background .2s,transform .25s}
-.flag:hover{background:rgba(120,120,140,.12);transform:translateX(3px)}
-.fl-n{flex:1;font-weight:600}.fl-s{color:var(--mut);font-size:12px;font-weight:400;margin-left:4px}
-.fl-r{text-align:right;font-weight:600}.fl-r small{display:block;font-weight:500}
-.pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;margin:5px 5px 0 0;white-space:nowrap;border:1px solid transparent}
-.p-neg{background:rgba(255,69,58,.16);color:var(--neg);border-color:rgba(255,69,58,.25)}
-.p-pos{background:rgba(48,209,88,.16);color:var(--pos);border-color:rgba(48,209,88,.25)}
-.p-warn{background:rgba(255,159,10,.17);color:var(--warn);border-color:rgba(255,159,10,.28)}
-.p-info{background:rgba(10,132,255,.15);color:var(--acc);border-color:rgba(10,132,255,.25)}
-.in{opacity:0;transform:translateY(16px) scale(.98);animation:in .7s cubic-bezier(.2,.9,.3,1) forwards;animation-delay:calc(var(--i,0)*70ms)}
-@keyframes in{to{opacity:1;transform:none}}
-.scroll{overflow:auto;max-height:72vh;border-radius:24px}
-table{border-collapse:separate;border-spacing:0;width:100%;font-size:13px}
-th{position:sticky;top:0;z-index:2;background:var(--stick);padding:12px;text-align:right;font-weight:700;font-size:12px;color:var(--mut);cursor:pointer;white-space:nowrap;border-bottom:1px solid var(--grid)}
-th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--stick);z-index:1}
-th:first-child{z-index:3}
-td{padding:7px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--grid)}
-td.fl{text-align:left;white-space:normal;min-width:190px}
-tbody tr:hover td{background:rgba(120,120,140,.1)}
-tr.sec td{background:rgba(120,120,140,.16)!important;font-weight:700;text-align:left;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut)}
-tr.own td:first-child{font-weight:700}
-/* recap */
-.rc th{padding:9px 10px}
-.rc thead tr:first-child th{height:38px;background:rgba(12,12,16,.92);color:#fff;text-align:center;border-left:1px solid rgba(255,255,255,.18)}
-.rc thead tr:first-child th:first-child{text-align:left;border-left:0}
-.rc thead tr:nth-child(2) th{top:38px;font-size:11px}
-.rc thead tr:nth-child(2) th:first-child{display:none}
-.rc td.sep,.rc th.sep{border-left:1px solid var(--grid)}
-.rc td{min-width:66px}
-.rc tr.band td{background:rgba(120,120,140,.24)!important;font-weight:700}
-.rc tr.band td:first-child{background:var(--stick)!important;box-shadow:inset 0 0 0 99px rgba(120,120,140,.24)}
-.rc tr.cpd td{font-weight:700}
-.rc td.cf-neg{background:rgba(255,69,58,.30)!important;font-weight:700}
-.rc td.cf-pos{background:rgba(48,209,88,.28)!important;font-weight:700}
-.drop{display:grid;place-items:center;text-align:center;padding:90px 20px;min-height:340px}
-.drop b{font-size:30px;letter-spacing:-.03em;display:block;margin-bottom:8px}
-.drop span{color:var(--mut);font-size:15px}
-.drop .o{width:84px;height:84px;border-radius:26px;margin:0 auto 22px;background:linear-gradient(135deg,#6f9bff,#ff8fd0);box-shadow:0 14px 40px rgba(111,155,255,.5),inset 0 2px 0 rgba(255,255,255,.6);animation:bob 4s ease-in-out infinite;display:grid;place-items:center;font-size:38px}
-@keyframes bob{50%{transform:translateY(-10px) rotate(3deg)}}
-body.dragging .glass{outline:3px dashed var(--acc);outline-offset:-8px}
-#setp{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s,opacity .4s,margin .4s}
-#setp.open{max-height:420px;opacity:1;margin-bottom:18px}
-.set{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;padding:20px}
-.set label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--mut);font-weight:600}
-.set .wide{grid-column:1/-1}
-dialog{border:1px solid var(--bd);border-radius:26px;width:min(720px,92vw);background:var(--glass2);backdrop-filter:blur(40px) saturate(180%);color:var(--txt);box-shadow:var(--sh);padding:22px}
-dialog::backdrop{background:rgba(0,0,0,.35);backdrop-filter:blur(6px)}
-textarea{width:100%;height:260px;border:1px solid var(--bd);border-radius:16px;background:rgba(120,120,140,.12);padding:12px;font-family:ui-monospace,Menlo,monospace;font-size:12px}
-.note{color:var(--mut);font-size:12px}
+html,body{margin:0}
+body{min-height:100vh;background:var(--bg);color:var(--txt);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;font-size:14px;line-height:1.45;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+button,select,input{font:inherit;color:inherit}
+header{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--bd)}
+.bar{max-width:1500px;margin:0 auto;padding:10px 20px;display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap}
+#ctl select{max-width:190px}
+.brand{font-weight:700;letter-spacing:-.02em;font-size:16px;display:flex;align-items:center;gap:8px;margin-right:6px}
+.brand i{width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,#6b4bff,#ff6fae 60%,#ffb35c);display:inline-block}
+.tabs{display:flex;gap:2px;background:var(--card2);border:1px solid var(--bd);padding:3px;border-radius:10px;flex-wrap:wrap}
+.tabs button{border:0;background:none;padding:6px 12px;border-radius:7px;font-weight:600;color:var(--mut);cursor:pointer}
+.tabs button.on{background:var(--card);color:var(--txt);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.tabs button:disabled{opacity:.4;cursor:default}
+.sp{flex:1}
+.btn{border:1px solid var(--bd);background:var(--card);border-radius:9px;padding:7px 13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--faint)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn.sm{padding:4px 9px;font-size:12px}
+.ctl{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ctl label{font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;display:flex;gap:6px;align-items:center}
+select,input[type=text],input[type=search]{border:1px solid var(--bd);background:var(--card);border-radius:8px;padding:6px 9px;max-width:100%}
+main{max-width:1500px;margin:0 auto;padding:18px 20px 80px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;box-shadow:var(--sh)}
+.pad{padding:18px 20px}
+h2{font-size:22px;letter-spacing:-.02em;margin:0 0 4px}
+h3{font-size:15px;margin:0 0 10px;letter-spacing:-.01em}
+.mut{color:var(--mut)}.faint{color:var(--faint)}.sm{font-size:12px}
+.pos{color:var(--pos)}.neg{color:var(--neg)}.warn{color:var(--warn)}
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:980px){.g2{grid-template-columns:1fr}}
+.kpi .n{font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.07em}
+.kpi .v{font-size:30px;font-weight:700;letter-spacing:-.03em;margin:4px 0 2px}
+.kpi .c{font-size:13px;font-weight:600}
+.drop{border:2px dashed var(--bd);border-radius:18px;padding:60px 20px;text-align:center;background:var(--card)}
+.drop b{font-size:20px;display:block;margin-bottom:6px;letter-spacing:-.02em}
+body.dragging .drop{border-color:var(--acc);background:var(--acc2)}
+.files{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:18px}
+.tag{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--bd);background:var(--card2);border-radius:99px;padding:3px 10px;font-size:12px;font-weight:600}
+.tag.ok::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--pos)}
+.tag.no::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--faint)}
+.src{display:inline-block;font-size:10px;font-weight:700;color:var(--acc);background:var(--acc2);border-radius:4px;padding:0 5px;margin-left:4px;vertical-align:1px;letter-spacing:.02em}
+.pill{display:inline-block;font-size:11px;font-weight:700;border-radius:99px;padding:1px 8px;margin:0 3px 0 0;white-space:nowrap}
+.p-pos{background:var(--posbg);color:var(--pos)}.p-neg{background:var(--negbg);color:var(--neg)}.p-new{background:var(--acc2);color:var(--acc)}.p-warn{background:rgba(179,107,0,.12);color:var(--warn)}
+/* note */
+.notewrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+@media(max-width:1100px){.notewrap{grid-template-columns:1fr}}
+.paper{background:var(--paper);border:1px solid var(--bd);border-radius:12px;box-shadow:var(--sh);padding:34px 40px;max-width:1000px;font-size:13.5px;line-height:1.5;outline:none}
+@media(max-width:640px){.paper{padding:20px 16px}}
+.paper h1{font-size:22px;margin:0 0 2px;letter-spacing:-.02em}
+.paper .meta{color:var(--mut);font-size:12px;margin-bottom:18px}
+.paper h4{font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin:22px 0 4px;color:var(--acc);border-bottom:2px solid var(--acc);padding-bottom:4px;display:flex;justify-content:space-between;gap:10px}
+.paper h4 small{color:var(--mut);font-weight:600;letter-spacing:.02em;text-transform:none}
+.paper h5{font-size:13px;margin:12px 0 2px}
+.paper p.lead{margin:8px 0;font-weight:600}
+.paper ul{margin:4px 0 4px;padding-left:20px}
+.paper li{margin:3px 0}
+.paper li ul{margin:2px 0}
+.paper hr{border:0;border-top:1px dashed var(--bd);margin:16px 0}
+.paper .k{font-weight:700}
+.side .card{margin-bottom:14px}
+.side ul{padding-left:18px;margin:6px 0}
+.side li{margin:4px 0}
+/* tables */
+.tw{overflow:auto;max-height:72vh;border:1px solid var(--bd);border-radius:12px;background:var(--card)}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:12.5px}
+th,td{padding:6px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--bd)}
+th{position:sticky;top:0;background:var(--card2);z-index:2;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;cursor:pointer;user-select:none}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);z-index:1}
+th:first-child{z-index:3;background:var(--card2)}
+tr:hover td{background:var(--card2)}
+tr.grp td{background:var(--card2);font-weight:700;color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.05em;text-align:left}
+td.l{text-align:left}
+.tw.wrap td:first-child{white-space:normal;min-width:220px}
+.tree{cursor:pointer;display:inline-block;width:16px;color:var(--faint)}
+.lv0 td:first-child{font-weight:700}.lv1 td:first-child{font-weight:600}
+.cpd td:first-child{box-shadow:inset 3px 0 0 var(--cpd)}
+.chips{display:flex;gap:4px;flex-wrap:wrap}
+.chip{border:1px solid var(--bd);background:var(--card);border-radius:99px;padding:1px 8px;font-size:11px;font-weight:600;cursor:pointer;color:var(--mut)}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.chartbox{position:relative;height:300px}
+.seglist{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,430px),1fr));gap:14px}
+.bars .row{display:grid;grid-template-columns:150px 1fr 70px;gap:8px;align-items:center;margin:5px 0;font-size:12.5px}
+.bars .track{height:10px;background:var(--card2);border-radius:99px;position:relative;overflow:hidden}
+.bars .fill{position:absolute;top:0;bottom:0;border-radius:99px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--txt);color:var(--bg);padding:9px 16px;border-radius:10px;font-weight:600;opacity:0;transition:opacity .25s;pointer-events:none;z-index:99}
+.toast.on{opacity:1}
+.loading{display:none;position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:90;place-items:center}
+.loading.on{display:grid}
+.loading div{background:var(--card);padding:18px 24px;border-radius:12px;font-weight:600;box-shadow:var(--sh)}
+.hint{font-size:12px;color:var(--mut);margin:6px 0 12px}
+details summary{cursor:pointer;font-weight:600}
+@media print{header,.side,.noprint{display:none!important}main{padding:0;max-width:none}.notewrap{display:block}.paper{border:0;box-shadow:none;padding:0;max-width:none}body{background:#fff}}
 </style>
 </head>
 <body>
-<div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
-
-<nav class="glass">
-  <div class="seg" id="tabs"><div class="thumb" id="thumb"></div>
-    <button data-t="rc" class="on">Recap</button><button data-t="ov">Flags</button><button data-t="ex">Explorer</button><button data-t="mk">Markets</button></div>
-  <input type="file" id="file" accept=".xlsx,.xls,.csv" hidden>
-  <button class="btn pri" onclick="file.click()">Upload</button>
-  <button class="btn" onclick="pd.showModal()">Paste</button>
-  <button class="btn ico" title="Flag settings" onclick="$('setp').classList.toggle('open')">⚙</button>
-  <button class="btn ico" id="theme" title="Theme">☾</button>
-</nav>
-
-<main>
-  <div class="hero in"><h1>Hair Colour</h1><p id="sub">Upload your Nielsen workbook to begin</p></div>
-  <div id="setp"><div class="glass"><div class="set" id="set"></div></div></div>
-  <div id="app"><div class="glass drop in"><div><div class="o">✦</div><b>Drop your Nielsen workbook</b><span>Excel or CSV · read in your browser · nothing is uploaded anywhere</span></div></div></div>
-</main>
-
-<dialog id="pd"><h3 style="margin:0 0 12px;font-size:20px">Paste from Excel</h3><textarea id="pt" placeholder="Copy a Nielsen block (including the header rows) and paste here"></textarea>
-  <div style="display:flex;gap:10px;margin-top:14px"><button class="btn pri" onclick="loadPaste()">Load</button><button class="btn" onclick="pd.close()">Close</button></div></dialog>
-
+<header><div class="bar">
+  <div class="brand"><i></i>Hair Colour Pulse</div>
+  <div class="tabs" id="tabs">
+    <button data-t="note" class="on">Monthly Note</button>
+    <button data-t="ov">Overview</button>
+    <button data-t="seg">Segments</button>
+    <button data-t="br">Brands</button>
+    <button data-t="mk">Markets</button>
+    <button data-t="kb">Knowledge</button>
+  </div>
+  <div class="sp"></div>
+  <div class="ctl" id="ctl"></div>
+  <input type="file" id="file" accept=".xlsx,.xls" multiple hidden>
+  <button class="btn pri" id="upl">Upload</button>
+  <button class="btn" id="theme" title="Toggle light/dark">Theme</button>
+</div></header>
+<main id="app"></main>
+<div class="toast" id="toast"></div>
+<div class="loading" id="loading"><div id="loadmsg">Reading workbook…</div></div>
 <script>
+'use strict';
+/* =====================================================================
+   KNOWLEDGE BASE — Canadian Mass Hair Colour
+   Line format: NAME | level | parent | brand | segments
+   level: T total, M manufacturer, B brand, F franchise, S sub-franchise,
+          X segment total, XM manufacturer x segment, XB brand x segment
+   segments: GREY, ROOTS, BOLDS, BLEACH, AFG (ammonia-free grey)
+   ===================================================================== */
+const KB_SRC=`
+MASS|T|||
+CPD|M|MASS||
+WELLA|M|MASS|CLAIROL|
+HENKEL|M|MASS|SCHWARZKOPF|
+REST OF MARKET|M|MASS||
+L OREAL PARIS|B|CPD|L OREAL PARIS|
+GARNIER|B|CPD|GARNIER|
+CLAIROL|B|WELLA|CLAIROL|
+GOT 2B|B|HENKEL|GOT 2B|BOLDS
+EXCELLENCE|F|L OREAL PARIS|L OREAL PARIS|GREY
+UNIVERSAL NUDES|S|EXCELLENCE|L OREAL PARIS|
+AGE PERFECT|F|L OREAL PARIS|L OREAL PARIS|
+PREFERENCE|F|L OREAL PARIS|L OREAL PARIS|GREY
+PREFERENCE BALAYAGE|S|PREFERENCE|L OREAL PARIS|BOLDS,BLEACH
+CASTING|F|L OREAL PARIS|L OREAL PARIS|GREY,AFG
+CASTING CREME GLOSS|S|CASTING|L OREAL PARIS|
+CASTING NATURAL GLOSS|S|CASTING|L OREAL PARIS|
+COULEUR EXPERTE|F|L OREAL PARIS|L OREAL PARIS|GREY
+COLORIST SECRETS|F|L OREAL PARIS|L OREAL PARIS|
+LE COLOR GLOSS|F|L OREAL PARIS|L OREAL PARIS|
+FERIA|F|L OREAL PARIS|L OREAL PARIS|BOLDS
+FERIA BASE|S|FERIA|L OREAL PARIS|
+FERIA BLEACH|S|FERIA|L OREAL PARIS|BLEACH
+FERIA POWER TONER|S|FERIA|L OREAL PARIS|
+COLORISTA|F|L OREAL PARIS|L OREAL PARIS|BOLDS
+COLORISTA BASE|S|COLORISTA|L OREAL PARIS|
+COLORISTA SPRAYS|S|COLORISTA|L OREAL PARIS|
+COLORISTA BLEACH|S|COLORISTA|L OREAL PARIS|BLEACH
+MAGIC ROOT COVER UP|F|L OREAL PARIS|L OREAL PARIS|ROOTS
+MAGIC ROOT PERMANENT|F|L OREAL PARIS|L OREAL PARIS|ROOTS
+MAGIC ROOT PRECISION|F|L OREAL PARIS|L OREAL PARIS|ROOTS
+HAIR MASCARA|F|L OREAL PARIS|L OREAL PARIS|ROOTS
+NUTRISSE|F|GARNIER|GARNIER|
+NUTRISSE CREAM|S|NUTRISSE|GARNIER|GREY
+NUTRISSE ULTRA COLOR|S|NUTRISSE|GARNIER|BOLDS
+NUTRISSE ULTRA COLOR PERM|S|NUTRISSE ULTRA COLOR|GARNIER|
+NUTRISSE ULTRA COLOR LIGHTENING|S|NUTRISSE ULTRA COLOR|GARNIER|BLEACH
+GARNIER NUTRISSE ULTRA COLOR LIGHT PLATINUM PL1 VGN KT|S|NUTRISSE ULTRA COLOR|GARNIER|
+NUTRISSE BLONDE|S|NUTRISSE|GARNIER|BLEACH
+BELLE COLOR|F|GARNIER|GARNIER|GREY
+GOOD|F|GARNIER|GARNIER|GREY,AFG
+OLIA|F|GARNIER|GARNIER|GREY,AFG
+OLIA BOLD|S|OLIA|GARNIER|BOLDS
+OLIA BOLD PERM|S|OLIA BOLD|GARNIER|
+OLIA BLEACH|S|OLIA|GARNIER|BLEACH
+COLOR SENSATION|F|GARNIER|GARNIER|ROOTS
+EXPRESS RETOUCH|F|GARNIER|GARNIER|ROOTS
+NICE & EASY|F|CLAIROL|CLAIROL|
+NICE N EASY BASE|S|NICE & EASY|CLAIROL|GREY
+NICE N EASY PURE BRUNETTES|S|NICE & EASY|CLAIROL|
+NICE N EASY HIGHLTS|S|NICE & EASY|CLAIROL|BOLDS
+NICE N EASY SPFX|S|NICE & EASY|CLAIROL|BOLDS
+NATURAL INSTINCTS|F|CLAIROL|CLAIROL|
+NATURAL INSTINCT BASE|S|NATURAL INSTINCTS|CLAIROL|GREY,AFG
+NATURAL INST ROOT|S|NATURAL INSTINCTS|CLAIROL|ROOTS
+NATURAL INSTINCTS BOLD|S|NATURAL INSTINCTS|CLAIROL|BOLDS
+COLORSTRONG|F|CLAIROL|CLAIROL|GREY
+L IMAGE|F|CLAIROL|CLAIROL|GREY
+BOLD & BRIGHT|F|CLAIROL|CLAIROL|BOLDS
+CLAIROL ROOT TOUCH-UP|F|CLAIROL|CLAIROL|ROOTS
+CLAIROL ROOT TOUCH-UP GEL|F|CLAIROL|CLAIROL|ROOTS
+CLAIROL ROOT TOUCH-UP SPRAY|F|CLAIROL|CLAIROL|ROOTS
+CLAIROL ROOT TOUCH-UP POWDER|F|CLAIROL|CLAIROL|ROOTS
+CLAIROL ROOT TOUCH-UP SPRAY 105G|F|CLAIROL|CLAIROL|ROOTS
+CLAIROL ROOT TOUCH-UP 2IN1 SPRAY|F|CLAIROL|CLAIROL|ROOTS
+COLOR ULTIME|F|HENKEL|SCHWARZKOPF|BOLDS
+KERATIN COLOR|F|HENKEL|SCHWARZKOPF|GREY
+PALETTE|F|HENKEL|SCHWARZKOPF|GREY
+ROOT RETOUCHER|F|HENKEL|SCHWARZKOPF|ROOTS
+KERATIN BLONDE|F|HENKEL|SCHWARZKOPF|BOLDS,BLEACH
+KERATIN ROOT|F|HENKEL|SCHWARZKOPF|ROOTS
+METALLICS|F|GOT 2B|GOT 2B|
+COLOR POP|F|GOT 2B|GOT 2B|
+GOT 2B SEMI PERM|F|GOT 2B|GOT 2B|
+JUST FOR MEN|B|REST OF MARKET|JUST FOR MEN|
+REVLON|B|REST OF MARKET|REVLON|
+COLORSILK BND REPAIR|F|REVLON|REVLON|GREY,AFG
+COLORSILK ORIGINAL|F|REVLON|REVLON|GREY,AFG
+COLORSILK|F|REVLON|REVLON|
+CREME OF NATURE|F|REVLON|REVLON|
+FROST & GLOW|F|REVLON|REVLON|BOLDS
+MANIC PANIC|B|REST OF MARKET|MANIC PANIC|BOLDS
+FLASH LIGHTENING|F|MANIC PANIC|MANIC PANIC|BLEACH
+MANIC PANIC SEMI PERM|F|MANIC PANIC|MANIC PANIC|
+MANIC PANIC TEMPORARY|F|MANIC PANIC|MANIC PANIC|
+SPLAT|B|REST OF MARKET|SPLAT|BOLDS
+SPLAT SEMI PERM|F|SPLAT|SPLAT|
+SPLAT TEMPORARY|F|SPLAT|SPLAT|
+BLEACH LONDON|B|REST OF MARKET|BLEACH LONDON|BOLDS
+HERBATINT|B|REST OF MARKET|HERBATINT|
+HERBATINT PERM|F|HERBATINT|HERBATINT|GREY,AFG
+HERBATINT HAIR TOUCH UP|F|HERBATINT|HERBATINT|ROOTS
+ICE CREAM|B|REST OF MARKET|ICE CREAM|GREY
+LUC VINCENT|B|REST OF MARKET|LUC VINCENT|GREY
+SOLFINE|B|REST OF MARKET|SOLFINE|GREY
+BIGEN|B|REST OF MARKET|BIGEN|GREY
+BIO MAGIC|B|REST OF MARKET|BIO MAGIC|GREY
+TINTS OF NATURE|B|REST OF MARKET|TINTS OF NATURE|GREY,AFG
+NATURTINT|B|REST OF MARKET|NATURTINT|GREY,AFG
+BETTER NATURED|B|REST OF MARKET|BETTER NATURED|GREY,AFG
+MILANO|B|REST OF MARKET|MILANO|
+COLOR OOPS|B|REST OF MARKET|COLOR OOPS|
+TRESEMME|B|REST OF MARKET|TRESEMME|ROOTS
+EVERPRO|B|REST OF MARKET|EVERPRO|ROOTS
+NO GRAY|B|REST OF MARKET|NO GRAY|ROOTS
+TOPPIK|B|REST OF MARKET|TOPPIK|ROOTS
+LOOKY|B|REST OF MARKET|LOOKY|ROOTS
+HAIR FLASH COLOR|B|REST OF MARKET|HAIR FLASH COLOR|BOLDS
+VIDAL SASSOON|B|REST OF MARKET|VIDAL SASSOON|GREY
+PRO SERIES|F|VIDAL SASSOON|VIDAL SASSOON|
+PHYTOCOLOR|B|REST OF MARKET|PHYTO|GREY
+ART ABSOLUTE|B|REST OF MARKET|VITALITYS|GREY
+TWEEN TIME|B|REST OF MARKET|ROUX|ROOTS
+SALON DE PRO|B|REST OF MARKET|DARIYA|GREY
+TL GREY COVERAGE|X|||GREY
+TL AMMONIA-FREE GREY|X|TL GREY COVERAGE||AFG
+TL ROOTS|X|||ROOTS
+TL PERM ROOTS|X|TL ROOTS||
+TL TEMP ROOTS|X|TL ROOTS||
+TL AMMONIA-FREE ROOT|X|TL ROOTS||
+TL BOLDS|X|||BOLDS
+TL PERMANENT BOLD|X|TL BOLDS||
+TL SEMI PERMANENT BOLD|X|TL BOLDS||
+TL TEMPORARY BOLD|X|TL BOLDS||
+TL AMMONIA-FREE BOLD|X|TL BOLDS||
+TL BLEACH|X|||BLEACH
+TL AMMONIA-FREE|X|||
+TL CPD GREY COVERAGE|XM|TL GREY COVERAGE|CPD|GREY
+TL CPD ROOTS|XM|TL ROOTS|CPD|ROOTS
+TL CPD BOLDS|XM|TL BOLDS|CPD|BOLDS
+TL CPD AMMONIA-FREE|XM|TL AMMONIA-FREE|CPD|
+L'OREAL PARIS GREY|XB|TL GREY COVERAGE|L OREAL PARIS|GREY
+GARNIER GREY|XB|TL GREY COVERAGE|GARNIER|GREY
+CLAIROL GREY|XB|TL GREY COVERAGE|CLAIROL|GREY
+SCHWARZKOPF GREY|XB|TL GREY COVERAGE|SCHWARZKOPF|GREY
+L'OREAL PARIS ROOT|XB|TL ROOTS|L OREAL PARIS|ROOTS
+CLAIROL ROOT|XB|TL ROOTS|CLAIROL|ROOTS
+SCHWARZKOPF ROOT|XB|TL ROOTS|SCHWARZKOPF|ROOTS
+L'OREAL PARIS BOLD|XB|TL BOLDS|L OREAL PARIS|BOLDS
+GARNIER BOLD|XB|TL BOLDS|GARNIER|BOLDS
+HENKEL BOLD|XB|TL BOLDS|SCHWARZKOPF|BOLDS
+CLAIROL BOLD|XB|TL BOLDS|CLAIROL|BOLDS
+L'OREAL PARIS BLEACH|XB|TL BLEACH|L OREAL PARIS|BLEACH
+GARNIER BLEACH|XB|TL BLEACH|GARNIER|BLEACH
+CLAIROL BLEACH|XB|TL BLEACH|CLAIROL|BLEACH
+REVLON BLEACH|XB|TL BLEACH|REVLON|BLEACH
+SPLAT BLEACH|XB|TL BLEACH|SPLAT|BLEACH
+BLEACH LONDON BLEACH|XB|TL BLEACH|BLEACH LONDON|BLEACH
+`;
+/* Brand universe (NielsenIQ, $ L52W): [brand, sub-brand ('*' = unassigned), $] */
+const UNIVERSE0=[["AMIRS","*",66],["AS I AM","CURL COLOR",7327],["ATLAS","*",4],["BESCO","HENNA",32],["BETTER NATURED","*",167839],["BIGEN","*",1372701],["BIGEN","ONE PUSH",188273],["BIGEN","ORIENTAL",59136],["BIO MAGIC","*",943091],["BIUTI","COLO BOMB",21529],["BLACK DIAMOND","*",934],["BLACK ROSE","*",1846],["BLEACH LONDON","*",863138],["BLEACH LONDON","BOND BUILDING",38374],["BLEACH LONDON","TOTAL BLEACH",155766],["CHRISTIAN MARTIN","ULTRA",2],["CLAIROL","*",219286],["CLAIROL","AGE DEFY",25],["CLAIROL","BLONDE IT UP",42817],["CLAIROL","BOLD & BRIGHT",594176],["CLAIROL","COLOR CRAVE",1004],["CLAIROL","COLOR GLOSS UP",5061],["CLAIROL","COLORSTRONG",2211460],["CLAIROL","EXPERT COLLECTION",72],["CLAIROL","L IMAGE",2067302],["CLAIROL","NATURAL INSTINCTS",10962600],["CLAIROL","NATURAL INSTINCTS BF",833131],["CLAIROL","NICE & EASY",12946640],["CLAIROL","ROOT TOUCH UP",13624679],["COLOR & SOIN","*",7176],["COLOR B4","*",292],["COLOR OOPS","*",1173616],["COLOR WOW","ROOT COVER UP",333],["COLORA","*",925],["COLORA","HENNA",17792],["COLORA","HENNA CREAM",990],["COLORA","PROFESSIONAL HENNA",1674],["COLOURLESS","*",8],["COVER YOUR GRAY","*",17116],["COVER YOUR GRAY","ROOT TOUCH UP",267],["DABUR","VATIKA",293278],["DARIYA","*",5],["DARIYA","PALTY",26],["DARIYA","SALON DE PRO",297318],["DARK&LOVELY","*",1502],["DARK&LOVELY","FADE RESISTANT",173],["DARK&NATURAL","*",2491],["DIPPITY DO","COLOR POP",90],["DIPPITY DO","COLORSTICK",10],["EVERPRO","GRAYAWAY",37115],["FANOLA","*",158],["GARNIER","BELLE COLOR",14916745],["GARNIER","BELLE COLOR ROOT TCH",22],["GARNIER","COLOR SENSATION",1076171],["GARNIER","COLOR STYLER",196],["GARNIER","EXPRESS RETOUCH",977],["GARNIER","GOOD",2635468],["GARNIER","NUTRISSE",718],["GARNIER","NUTRISSE BLONDE",13902],["GARNIER","NUTRISSE CREAM",13042425],["GARNIER","NUTRISSE INTENSE",2390236],["GARNIER","NUTRISSE MOUSSE",10],["GARNIER","NUTRISSE RADIANCE",154],["GARNIER","NUTRISSE ULTRA COLOR",6678435],["GARNIER","NUTRISSE ULTRA CREME",898214],["GARNIER","OLIA",8777198],["GODREJ","NUPUR",1240],["GOODMARK","*",30],["GOSH","*",10],["GOT 2B","COLOR POP",10053],["GOT 2B","COLOR REMIX",714393],["GOT 2B","CREATIVE",884],["GOT 2B","HEAD TURNER",30],["GOT 2B","METALLICS",2419632],["GOT 2B","UNLIMITED",58],["GRECIAN FORMULA","*",37],["HAIR FLASH COLOR","*",253],["HENNA","*",1065],["HENNA","NUANCE",7342],["HENNA PLUS","*",6295],["HERBAL GLO","2 MINUTE",2038],["HERBATINT","*",3492582],["HI TEST","*",10271],["ICE CREAM","*",5093056],["IGORA ROYAL","*",20099],["IGORA ROYAL","ABSOLUTES",539],["IGORA ROYAL","HIGHLIFTS",313],["INEBRYA","*",47079],["IRENE GARI","*",4145],["JEAN MURRAT","*",23],["JENERE","*",7309],["JEROME RUSSELL","*",21593],["JEROME RUSSELL","B SWEET",643],["JEROME RUSSELL","BWILD",809],["JEROME RUSSELL","PUNKY COLOR",177396],["JEROME RUSSELL","TEAM COLORS",6],["JOICO","*",419],["JOICO","VERO K PAK",16094],["JUST FOR MEN","1 DAY",1269070],["JUST FOR MEN","COLOUR PRESERVE",77708],["JUST FOR MEN","COMB IN COLOR",3063369],["JUST FOR MEN","CONTROLGX",3715540],["JUST FOR MEN","MOUSTACHE & BEARD",10680358],["JUST FOR MEN","SHAMPOO IN COLOR",5341562],["JUST FOR MEN","TOUCH OF GREY",703936],["KRISTIN ESS","*",10],["L OREAL PARIS","AGE PERFECT",43100],["L OREAL PARIS","CASTING",3163730],["L OREAL PARIS","COLOR PULSE",12],["L OREAL PARIS","COLORIST SECRETS",279734],["L OREAL PARIS","COLORISTA",4360168],["L OREAL PARIS","COULEUR EXPERTE",252818],["L OREAL PARIS","EXCELLENCE",1307726],["L OREAL PARIS","EXCELLENCE AGE PRFCT",1615703],["L OREAL PARIS","EXCELLENCE CREME",21011740],["L OREAL PARIS","EXCELLENCE TO GO",31],["L OREAL PARIS","FERIA",13155232],["L OREAL PARIS","FERIA HI LIFT",607334],["L OREAL PARIS","FERIA POWER REDS",1453900],["L OREAL PARIS","LE COLOR GLOSS",1854635],["L OREAL PARIS","MAGIC ROOT COVER UP",8601875],["L OREAL PARIS","MAGIC ROOT PRECISION",766956],["L OREAL PARIS","MAGIC ROOT RESCUE",970276],["L OREAL PARIS","MEN EXPERT",36664],["L OREAL PARIS","PERFECT BLONDISSIMA",55],["L OREAL PARIS","PREFERENCE",390148],["L OREAL PARIS","PREFERENCE DRM BLOND",17],["L OREAL PARIS","PREFERENCE GLM LGHTS",133],["L OREAL PARIS","PREFERENCE MOSS ABSL",1296],["L OREAL PARIS","ROOT RESCUE",2571939],["L OREAL PARIS","SERIE EXP",113],["L OREAL PARIS","SUPERIOR PREFERENCE",19637254],["L OREAL PARIS","SUPR PREFERNCE INFNA",2990418],["LIESE","PRETTIA",1026],["LOOKY","*",338],["LUC VINCENT","*",668679],["LYS PARISIEN","*",2],["MANIC PANIC","*",4968526],["MANIC PANIC","AMPLIFIED",1164132],["MANIC PANIC","BLUE PANTHER",19734],["MANIC PANIC","CLASSIC HIGH VOLTAGE",1579636],["MANIC PANIC","CREAMTONE",14],["MANIC PANIC","FLASH LIGHTENING",837943],["MANIC PANIC","HIGH VOLTAGE",155506],["MANIC PANIC","LOVE COLOR",50772],["MANIC PANIC","TIGERS EYE",10534],["MARC ANTHONY","BYE BYE GRAY",5],["MILANO","*",54756],["MISE EN SCENE","*",155451],["MISS CLAIROL","SHAMPOO",4],["MONDIAL","*",27],["NATURIGIN","*",2925],["NATURTINT","*",321009],["NO GRAY","QUICK FIX",34428],["NOVACOLOR","*",17],["OIAMIGA","*",25327],["PAINTGLOW","*",1071],["PAINTGLOW","REBELLIOUS COLOR",2155],["PAON","SEVEN EIGHT",77],["PHYTO","*",6102],["PHYTO","PHYTOCOLOR",503835],["PRIVATE LABEL","*",1020821],["PRO FACTOR","*",3188],["RADICO","*",509],["REFECTOCIL","*",40],["REVLON","*",99800],["REVLON","COLORSILK BEATFL CLR",392164],["REVLON","COLORSILK BND REPAIR",1140019],["REVLON","CREME OF NATURE",63268],["REVLON","FROST & GLOW",448815],["REVLON","NUTRI COLOR",1692],["REVLON","TOTAL COLOR",27],["REWIND IT 10","*",94838],["ROCK THE LOCKS","*",439],["ROCK THE LOCKS","COLOR ME PINK",1758],["ROUX","FANCIFULL",15505],["ROUX","TWEEN TIME",70179],["ROUX","VIOLITES",7021],["RYO","*",49901],["SANOTINT","*",1647],["SCENTUAL SCENTS","HENNA",14746],["SCHWARZKOPF","*",588],["SCHWARZKOPF","COLOR ULTIME",1103110],["SCHWARZKOPF","KERATIN BLONDE",971264],["SCHWARZKOPF","KERATIN COLOR",5980964],["SCHWARZKOPF","KERATIN ROOT",936431],["SCHWARZKOPF","PALETTE",100334],["SCHWARZKOPF","ROOT RETOUCHER",643038],["SHOHAN","*",578],["SOLFINE","*",431192],["SOLFINE","CREMA COLOR",3944608],["SOLFINE","NATURAL COLOR",54658],["SPLAT","*",2504795],["SPLAT","HAIR CHALK",184],["SPLAT","WASHABLES",711],["STARGAZER","*",8],["STREAKS N TIPS","*",658],["SUN BUM","*",181193],["TINTS OF NATURE","*",171172],["TOUCHY","*",312],["TRESEMME","ROOT TOUCH UP",2117189],["VIDAL SASSOON","PRO SERIES",7088],["VIDAL SASSOON","SALONIST",1596],["VITALITYS","*",25577],["VITALITYS","ART ABSOLUTE",329493],["VITALITYS","ART PERFORMER",71376],["VITALITYS","TONE SHINE",7411],["VITALITYS","ZERO",368],["WATER WORKS","*",244],["WELLA","*",142],["WELLA","COLOR CHARM",5088],["WELLA","COLOR FRESH",57763],["WELLA","PROFESSIONALS",8581],["WHITE MAGIC","*",4504],["YOUTHAIR","*",395]];
+const SEGS=[
+ {k:'GREY',row:'TL GREY COVERAGE',cpd:'TL CPD GREY COVERAGE',name:'Grey Coverage',main:1},
+ {k:'BOLDS',row:'TL BOLDS',cpd:'TL CPD BOLDS',name:'Bolds',main:1},
+ {k:'ROOTS',row:'TL ROOTS',cpd:'TL CPD ROOTS',name:'Roots',main:1},
+ {k:'AFG',row:'TL AMMONIA-FREE GREY',name:'Ammonia-Free Grey',main:1},
+ {k:'BLEACH',row:'TL BLEACH',name:'Bleach',main:1},
+ {k:'AFR',row:'TL AMMONIA-FREE ROOT',name:'Ammonia-Free Root'},
+ {k:'AFB',row:'TL AMMONIA-FREE BOLD',name:'Ammonia-Free Bold'},
+ {k:'PBOLD',row:'TL PERMANENT BOLD',name:'Permanent Bold'},
+ {k:'SBOLD',row:'TL SEMI PERMANENT BOLD',name:'Semi-Permanent Bold'},
+ {k:'TBOLD',row:'TL TEMPORARY BOLD',name:'Temporary Bold'}];
+const SEGK=Object.fromEntries(SEGS.map(s=>[s.k,s]));
+/* Segment membership — mirrors the "By Period" sheet of the Hair Colour Nielsen Deck.
+   Replaced automatically when a deck workbook with a "By Period" sheet is uploaded. */
+const SEGMEM0={
+ GREY:['PREFERENCE','EXCELLENCE','CASTING','NUTRISSE CREAM','BELLE COLOR','OLIA','GOOD','NICE N EASY BASE','NICE N EASY PURE BRUNETTES','NATURAL INSTINCT BASE','COLORSTRONG','L IMAGE','KERATIN COLOR','PALETTE','SOLFINE','ICE CREAM','HERBATINT PERM','COLORSILK BND REPAIR'],
+ ROOTS:['MAGIC ROOT COVER UP','MAGIC ROOT PERMANENT','MAGIC ROOT PRECISION','COLOR SENSATION','CLAIROL ROOT TOUCH-UP','CLAIROL ROOT TOUCH-UP SPRAY 105G','CLAIROL ROOT TOUCH-UP SPRAY','CLAIROL ROOT TOUCH-UP 2IN1 SPRAY','CLAIROL ROOT TOUCH-UP POWDER','CLAIROL ROOT TOUCH-UP GEL','NATURAL INST ROOT','KERATIN ROOT','ROOT RETOUCHER','TRESEMME','HERBATINT HAIR TOUCH UP','EVERPRO','HAIR MASCARA'],
+ BOLDS:['FERIA','COLORISTA','GARNIER BOLD','COLOR ULTIME','KERATIN BLONDE','GOT 2B','MANIC PANIC','SPLAT','CLAIROL BOLD','BLEACH LONDON'],
+ PBOLD:['FERIA BASE','NUTRISSE ULTRA COLOR PERM','COLOR ULTIME','METALLICS','BOLD & BRIGHT','NATURAL INSTINCTS BOLD'],
+ SBOLD:['COLORISTA BASE','SPLAT SEMI PERM','GOT 2B SEMI PERM','MANIC PANIC SEMI PERM'],
+ TBOLD:['COLORISTA SPRAYS','SPLAT TEMPORARY','MANIC PANIC TEMPORARY'],
+ BLEACH:['FERIA BLEACH','COLORISTA BLEACH','PREFERENCE BALAYAGE','NUTRISSE ULTRA COLOR LIGHTENING','NUTRISSE BLONDE','OLIA BLEACH','CLAIROL BLEACH','REVLON BLEACH','KERATIN BLONDE','FLASH LIGHTENING','BLEACH LONDON BLEACH','SPLAT BLEACH'],
+ AFG:['UNIVERSAL NUDES','OLIA','GOOD','CASTING','NATURAL INSTINCT BASE','COLORSTRONG','HERBATINT PERM','BIGEN','COLORSILK BND REPAIR','BIO MAGIC','PHYTOCOLOR','SALON DE PRO','TINTS OF NATURE','CREME OF NATURE'],
+ AFR:['MAGIC ROOT COVER UP','COLOR SENSATION','TRESEMME','CLAIROL ROOT TOUCH-UP SPRAY 105G','CLAIROL ROOT TOUCH-UP SPRAY','CLAIROL ROOT TOUCH-UP 2IN1 SPRAY','CLAIROL ROOT TOUCH-UP GEL','NATURAL INST ROOT','KERATIN ROOT','HERBATINT HAIR TOUCH UP','EVERPRO'],
+ AFB:['COLORISTA','FERIA POWER TONER','GARNIER NUTRISSE ULTRA COLOR LIGHT PLATINUM PL1 VGN KT','OLIA BOLD','MANIC PANIC','NATURAL INSTINCTS BOLD','FROST & GLOW','COLOR POP']};
+let SEGMEM=JSON.parse(JSON.stringify(SEGMEM0));
+const ALIAS={'COLORSILK BOND REPAIR':'COLORSILK BND REPAIR','HERBATINT PERM ':'HERBATINT PERM'};
+const OWNER={CPD:"L'Oréal CPD",WELLA:'Wella Company',HENKEL:'Henkel','JUST FOR MEN':'Combe',REVLON:'Revlon',BIGEN:'Hoyu',TRESEMME:'Unilever'};
+const BIG=['CPD','WELLA','HENKEL'];
+const BANNERS={'WALMART NATIONAL':'Walmart','SDM NATIONAL':'SDM','LCL NATIONAL':'LCL','JEAN COUTU QUEBEC':'PJC','REXALL ONT + WEST':'Rexall','LONDON DRUGS WEST':'London Drugs','BRUNET QUEBEC':'Brunet','UNIPRIX QUEBEC':'Uniprix'};
+const PRETTY={'MASS':'Mass Hair Colour','CPD':'CPD','L OREAL PARIS':"L'Oréal Paris","L'OREAL PARIS":"L'Oréal Paris",'GOT 2B':'got2b','NICE & EASY':"Nice'n Easy",'WELLA':'Wella (Clairol)','HENKEL':'Henkel (Schwarzkopf)','REST OF MARKET':'Rest of Market','TRESEMME':'TRESemmé','L IMAGE':"L'Image",'COLORSILK BND REPAIR':'Colorsilk Bond Repair','NICE N EASY HIGHLTS':"Nice'n Easy Highlights",'NICE N EASY BASE':"Nice'n Easy Base",'NICE N EASY SPFX':"Nice'n Easy SPFX",'NICE N EASY PURE BRUNETTES':"Nice'n Easy Pure Brunettes",'NATURAL INST ROOT':'Natural Instincts Root','NATURAL INSTINCT BASE':'Natural Instincts Base','CLAIROL ROOT TOUCH-UP':'Clairol RTU','CLAIROL ROOT TOUCH-UP SPRAY 105G':'Clairol RTU Spray 105g','CLAIROL ROOT TOUCH-UP SPRAY':'Clairol RTU Spray','CLAIROL ROOT TOUCH-UP GEL':'Clairol RTU Gel','CLAIROL ROOT TOUCH-UP POWDER':'Clairol RTU Powder','CLAIROL ROOT TOUCH-UP 2IN1 SPRAY':'Clairol RTU 2-in-1 Spray','GARNIER NUTRISSE ULTRA COLOR LIGHT PLATINUM PL1 VGN KT':'Nutrisse Ultra Color PL1 Platinum','PRO SERIES':'Pro Series','ART ABSOLUTE':'Art Absolute','PHYTOCOLOR':'Phytocolor','HERBATINT PERM':'Herbatint Permanent','GOT 2B SEMI PERM':'got2b Semi-Perm','SCHWARZKOPF':'Schwarzkopf','LCL':'LCL','SDM':'SDM'};
+const BRANDPRETTY=b=>PRETTY[b]||tc(b);
+
+/* ===================== helpers ===================== */
 const $=id=>document.getElementById(id);
-const PK=[['y24','2024'],['y25','2025'],['ytd','YTD'],['l13','Latest 13 Wks'],['lp','Latest Period']];
-const DEF={minShr:0.3,decl:5,grow:10,minD:25000,swing:10,
- own:"CPD, L OREAL PARIS, GARNIER, PREFERENCE, EXCELLENCE, FERIA, MAGIC ROOT, COLORISTA, CASTING, COLOR GLOSS, AGE PERFECT, COULEUR EXPERTE, NUTRISSE, BELLE COLOR, OLIA, GOOD, COLOR SENSATION"};
-let S=Object.assign({},DEF,JSON.parse(localStorage.getItem('hcset')||'{}'));
-let M={},BM=null,fileName='',tab='rc',sortK=null,sortDir=-1,charts={},RS={i:null,dir:1};
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const norm=s=>String(s).toUpperCase().replace(/[^A-Z0-9 ]/g,'').replace(/\s+/g,' ').trim();
-const isOwn=n=>S.own.split(',').map(norm).filter(Boolean).some(o=>norm(n)===o||norm(n).startsWith(o+' '));
-const f1=v=>v==null?'':v.toFixed(1);
-const f1d=v=>v==null?'–':v.toFixed(1);
-const pc=v=>v==null?'–':(v>0?'+':'')+v.toFixed(1)+'%';
-const pcx=v=>v==null?'':v.toFixed(1)+'%';
-const dl=v=>v==null?'–':(v<0?'-':'+')+'$'+Math.abs(Math.round(v)).toLocaleString('en-US');
-const cl=v=>v>0?'pos':v<0?'neg':'';
-const heat=v=>v==null?'':`background:rgba(${v>0?'48,209,88':'255,69,58'},${Math.min(Math.abs(v)/40,1)*.26})`;
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const clean=s=>String(s??'').replace(/\s+/g,' ').trim().toUpperCase();
+function tc(s){return String(s).toLowerCase().replace(/(^|[\s\-\/(])([a-z])/g,(m,a,b)=>a+b.toUpperCase()).replace(/\bN\b/g,"'n").replace(/\bTl\b/,'').replace(/\bCpd\b/,'CPD').replace(/\bLcl\b/,'LCL').replace(/\bSdm\b/,'SDM').replace(/\bRtu\b/,'RTU').replace(/\bDr\b/,'DR').replace(/\bMm\b/,'MM').replace(/\bGb\b/,'GB').replace(/\bNfld\b/,'NFLD').trim()}
+const pretty=p=>PRETTY[p]??(/^TL /.test(p)?tc(p.replace(/^TL /,'')):/^L'?\s?OREAL PARIS /.test(p)?"L'Oréal Paris "+tc(p.replace(/^L'?\s?OREAL PARIS /,'')):tc(p));
+const fin=v=>v!=null&&isFinite(v);
+const sp=(v,d=1)=>fin(v)?(v>=0?'+':'')+v.toFixed(d)+'%':'n/a';
+const spp=(v,d=1)=>fin(v)?(v>=0?'+':'')+v.toFixed(d)+' pts':'n/a';
+const f1=v=>fin(v)?v.toFixed(1):'n/a';
+const cls=v=>fin(v)?(v>0?'pos':v<0?'neg':''):'';
+function money(v,signed=true){if(!fin(v))return'n/a';const a=Math.abs(v);let s=a>=1e6?(a/1e6).toFixed(a>=1e7?0:1)+'M':a>=1e3?Math.round(a/1e3)+'k':Math.round(a)+'';return(signed?(v<0?'-':'+'):(v<0?'-':''))+'$'+s}
+function big(v){if(!fin(v))return'n/a';const a=Math.abs(v);return a>=1e6?(v/1e6).toFixed(1)+'M':a>=1e3?(v/1e3).toFixed(0)+'k':v.toFixed(0)}
+const C=(v,t)=>`<span class="${cls(v)}">${t}</span>`;
+const du=m=>m.isNew?`<span class="pill p-new">NEW</span> $ ${money(m.d,false)}`:`$ ${C(m.dp,sp(m.dp))}, U ${C(m.up,sp(m.up))}`;
 const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-const LV0=new Set(['MASS','CPD','L OREAL PARIS','GARNIER','WELLA','CLAIROL','HENKEL','MANIC PANIC','SOLFINE','ICE CREAM','HERBATINT','SPLAT','TRESEMME','REVLON'].map(norm));
-const LV2=new Set(['MAGIC ROOT COVER UP','MAGIC ROOT PERMANENT','MAGIC ROOT PRECISION','NUTRISSE CREAM','NUTRISSE ULTRA COLOR','NICE N EASY BASE','NICE N EASY PURE BRUNETTES','NICE N EASY SPFX','NATURAL INSTINCT BASE','NATURAL INSTINCTS BOLD','NATURAL INST ROOT'].map(norm));
-const AGG=new Set(['MASS','CPD','L OREAL PARIS','GARNIER','WELLA','CLAIROL','HENKEL'].map(norm));
-function levels(rows){const inds=[...new Set(rows.map(r=>r.ind||0))].sort((a,b)=>a-b);
- if(inds.length>1)return rows.map(r=>inds.indexOf(r.ind||0));
- return rows.map(r=>LV0.has(norm(r.name))?0:LV2.has(norm(r.name))?2:1)}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),1800)}
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
-/* ---------- THEME / FX ---------- */
-document.documentElement.dataset.theme=localStorage.getItem('hctheme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-function themeIcon(){$('theme').textContent=document.documentElement.dataset.theme==='dark'?'☀':'☾'}
-$('theme').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;localStorage.setItem('hctheme',t);themeIcon();if(BM||Object.keys(M).length)draw()};
-themeIcon();
-document.addEventListener('mousemove',e=>{const g=e.target.closest&&e.target.closest('.glass');if(!g)return;const r=g.getBoundingClientRect();g.style.setProperty('--mx',(e.clientX-r.left)+'px');g.style.setProperty('--my',(e.clientY-r.top)+'px')});
-function moveThumb(){const b=document.querySelector('#tabs button.on'),t=$('thumb');t.style.left=b.offsetLeft+'px';t.style.width=b.offsetWidth+'px'}
-addEventListener('load',moveThumb);addEventListener('resize',moveThumb);
-function countUp(){document.querySelectorAll('[data-v]').forEach(el=>{const to=+el.dataset.v,t0=performance.now();
- (function f(t){const k=Math.min((t-t0)/900,1),e=1-Math.pow(1-k,4);el.textContent=(to*e).toFixed(1);if(k<1)requestAnimationFrame(f)})(t0)})}
-function chartBase(){Chart.defaults.color=css('--mut');Chart.defaults.font.family='-apple-system,"SF Pro Text",Inter,sans-serif';Chart.defaults.borderColor=css('--grid')}
+/* ===================== state ===================== */
+const ST={cube:null,prods:[],mkts:[],pers:[],nat:null,per:'m',mkt:null,label:'',file:'',tab:'note',universe:UNIVERSE0,uniFile:null,open:new Set(['MASS','CPD','WELLA','HENKEL','REST OF MARKET']),q:'',sort:{k:'d',dir:-1},mxMetric:'dp',mxPlayers:null};
+let KB={};
+function buildKB(){KB={};
+ for(const line of KB_SRC.trim().split('\n')){const[n,l,p,b,s]=line.split('|').map(x=>x.trim());KB[n]={n,l,p:p||null,b:b||null,seg:s?s.split(','):[],src:'kb'}}
+ SEGMEM=JSON.parse(JSON.stringify(ST.deckSeg||SEGMEM0));
+ const ov=LS.get('hcp.segmem',null);if(ov)for(const k in ov)SEGMEM[k]=ov[k];
+}
+/* segment of a line = first main segment listing it (or an ancestor) */
+function segOf(p){const chain=[p,...ancestors(p)];for(const s of SEGS)if(SEGMEM[s.k]&&chain.some(c=>SEGMEM[s.k].includes(c)))return s.k;return null}
+buildKB();
+function inferKB(name){ // fallback for lines not in the knowledge base
+ if(KB[name])return KB[name];
+ let e;const uni=ST.universe;
+ if(/^TL /.test(name))e={l:'X',p:null,b:null,seg:[]};
+ else{const m=name.match(/^(.*) (GREY|ROOT|BOLD|BLEACH)$/);const brands=new Set(uni.map(r=>r[0]));
+  if(m&&(brands.has(m[1])||KB[m[1]]||m[1]==="L'OREAL PARIS"))e={l:'XB',p:null,b:m[1].replace("'",' ').replace('L OREAL','L OREAL'),seg:[{GREY:'GREY',ROOT:'ROOTS',BOLD:'BOLDS',BLEACH:'BLEACH'}[m[2]]]};
+  else if(brands.has(name))e={l:'B',p:'REST OF MARKET',b:name,seg:[]};
+  else{const hit=uni.find(r=>r[1]===name)||uni.find(r=>name.startsWith(r[0]+' '));
+   if(hit){const par=KB[hit[0]]?hit[0]:(hit[0]==='SCHWARZKOPF'?'HENKEL':'REST OF MARKET');e={l:'F',p:par,b:hit[0],seg:[]}}
+   else{const pre=Object.keys(KB).filter(k=>/^[FBS]$/.test(KB[k].l)&&name.startsWith(k+' ')).sort((a,b)=>b.length-a.length)[0];
+    e=pre?{l:'S',p:pre,b:KB[pre].b,seg:[]}:{l:'B',p:'REST OF MARKET',b:name,seg:[]}}}}
+ e.n=name;e.src='inferred';KB[name]=e;return e}
+const kb=n=>KB[n]||inferKB(n);
+function mfOf(n){let e=kb(n),g=0;while(e&&g++<10){if(e.l==='M')return e.n;if(e.l==='T')return null;e=e.p?kb(e.p):null}return 'REST OF MARKET'}
+const isCPD=n=>mfOf(n)==='CPD'||kb(n).b==='CPD';
+const ancestors=n=>{const a=[];let e=kb(n),g=0;while(e&&e.p&&g++<10){a.push(e.p);e=kb(e.p)}return a};
+function fullName(n){const e=kb(n),p=pretty(n);if(!e||!/^[FS]$/.test(e.l)||!e.b)return p;const b=BRANDPRETTY(e.b);
+ const first=b.split(' ')[0].toLowerCase().replace(/[^a-z]/g,'');if(p.toLowerCase().replace(/[^a-z ]/g,'').startsWith(first))return p;return b+' '+p}
 
-/* ---------- PARSING ---------- */
-function per(s){s=s.toLowerCase();
- if(s==='2024')return'y24';if(s==='2025')return'y25';if(/^ytd/.test(s))return'ytd';
- if(/13/.test(s)&&/(latest|last|l13)/.test(s))return'l13';if(/^(latest p|lp|last p|current p)/.test(s))return'lp';return null}
-function num(v){if(v==null)return null;let s=String(v).trim();if(!s||s==='-')return null;
- const neg=/^\(.*\)$/.test(s)||/^-/.test(s)||/^\$\s*-/.test(s)||/^-\s*\$/.test(s);s=s.replace(/[^0-9.]/g,'');if(!s)return null;const n=parseFloat(s);return isNaN(n)?null:(neg?-n:n)}
-/* layout A: periods across (By Period) */
-function parseRows(rows,dflt){
- let cur=null,sec=null,blank=false,pend=null,out=[];
- for(const r of rows){
-  const c=r.map(x=>x==null?'':String(x).trim());
-  const hits={};c.forEach((x,i)=>{const k=per(x);if(k&&!(k in hits))hits[k]=i});
-  const mi=c.findIndex(x=>/^market$/i.test(x));
-  if(mi>=0){const nm=c.slice(mi+1).find(x=>x&&!per(x));if(nm)pend=nm}
-  if(Object.keys(hits).length>=3){
-    cur={name:pend||dflt,starts:hits,labels:Object.fromEntries(c.map((x,i)=>[per(x),x]).filter(a=>a[0])),sections:[]};
-    sec={name:'Brand & franchise',rows:[]};cur.sections.push(sec);blank=false;pend=null;out.push(cur);continue}
-  if(!cur)continue;
-  if(c.every(x=>x==='')){blank=true;continue}
-  const name=c[0];if(!name||name==='$/Units')continue;
-  const p={};let any=false;
-  for(const [k] of PK){const st=cur.starts[k];if(st==null)continue;
-    const o={shr:num(c[st]),chg:num(c[st+1]),d:num(c[st+2])};
-    if(o.shr!=null||o.d!=null){any=true}p[k]=o}
-  if(!any)continue;
-  if(blank){sec={name:/^TL /i.test(name)?name:'Other',rows:[]};cur.sections.push(sec);blank=false}
-  const raw0=r[0]==null?'':String(r[0]);
-  sec.rows.push({name,sec:sec.name,p,ind:raw0.match(/^\s*/)[0].length})
+/* ===================== parsing ===================== */
+const FACT={'$':'d','UNITS':'u','$ CHG YA':'dc','UNITS CHG YA':'uc','$ % CHG YA':'dp0','UNITS % CHG YA':'up0','$ SHR - PRODUCT':'ds0','UNITS SHR - PRODUCT':'us0'};
+function factKey(f){f=clean(f);if(FACT[f])return FACT[f];if(/^\$ ?SHR/.test(f))return'ds0';if(/^UNITS? ?SHR/.test(f))return'us0';if(/^\$ ?% ?CHG/.test(f))return'dp0';if(/^UNITS? ?% ?CHG/.test(f))return'up0';if(/^\$ ?CHG/.test(f))return'dc';if(/^UNITS? ?CHG/.test(f))return'uc';if(f==='DOLLARS'||f==='$ SALES')return'd';if(/^UNIT/.test(f))return'u';return null}
+function perKey(p){const s=p.toLowerCase();let m;if(/^ytd/.test(s))return'y';if(/13\s*w/.test(s))return'q';if(/52\s*w/.test(s))return'a';if(m=s.match(/(?:cal(?:endar)?\s*y(?:ea)?r|^fy)\s*(\d{4})/))return'c'+m[1];return'm'}
+function parseLong(rows,acc){
+ let h=-1;for(let i=0;i<Math.min(rows.length,40);i++){const r=rows[i].map(clean);if(r.includes('PRODUCTS')&&r.includes('MARKETS')&&r.includes('PERIODS')&&r.includes('FACTS')){h=i;break}}
+ if(h<0)return false;const hr=rows[h].map(clean),ip=hr.indexOf('PRODUCTS'),im=hr.indexOf('MARKETS'),ie=hr.indexOf('PERIODS'),iF=hr.indexOf('FACTS');
+ let iv=hr.indexOf('VALUE');if(iv<0)iv=Math.max(ip,im,ie,iF)+1;
+ const{cube,prods,mkts,pers}=acc;const seenP=new Set(prods),seenM=new Set(mkts);
+ const names=new Set();for(let i=h+1;i<rows.length;i++)if(rows[i][iF])names.add(clean(rows[i][ip]));
+ const whcAsMass=!names.has('MASS')&&[...names].some(n=>/^WOMEN'?S HC/.test(n));
+ let n=0;for(let i=h+1;i<rows.length;i++){const r=rows[i];const f=r[iF];if(f==null||f==='')continue;const fk=factKey(f);if(!fk)continue;
+  let v=r[iv];if(v===''||v==null)continue;if(typeof v!=='number'){v=parseFloat(String(v).replace(/[,$\s]/g,''));if(!isFinite(v))continue}
+  let p=clean(r[ip]);const m=clean(r[im]),pr=String(r[ie]).trim();if(!p||!m||!pr)continue;
+  p=ALIAS[p]||p;if(whcAsMass&&/^WOMEN'?S HC/.test(p))p='MASS';
+  if(!seenP.has(p)){seenP.add(p);prods.push(p)}if(!seenM.has(m)){seenM.add(m);mkts.push(m)}
+  if(!pers[pr]){let k=perKey(pr);const used=new Set(Object.values(pers));if(used.has(k)){let j=2;while(used.has(k+j))j++;k=k+j}pers[pr]=k}
+  const pk=pers[pr];((cube[p]??={})[m]??={})[pk]??={};cube[p][m][pk][fk]=v;n++}
+ return n>0}
+/* "By Period" deck sheet: rows grouped in blank-separated sections headed by TL segment lines */
+function parseDeckSegments(rows){let col=-1;for(const r of rows.slice(0,15)){const j=r.findIndex(x=>clean(x)==='MASS');if(j>=0){col=j;break}}if(col<0)return null;
+ const byRow=Object.fromEntries(SEGS.map(s=>[s.row,s.k]));const out={};let cur=null;
+ for(const r of rows){const p0=clean(r[col]);if(!p0){cur=null;continue}const p=ALIAS[p0]||p0;
+  if(/^TL /.test(p)){if(byRow[p]){cur=byRow[p];out[cur]=[]}continue}
+  if(cur&&!out[cur].includes(p))out[cur].push(p)}
+ // keep a brand x segment line only when none of its franchises are listed
+ for(const k in out)out[k]=out[k].filter(p=>!(kb(p).l==='XB'&&out[k].some(q=>q!==p&&kb(q).b&&kb(q).b===kb(p).b&&kb(q).l!=='XB')));
+ return Object.keys(out).length>=3?out:null}
+function parseUniverse(rows){let h=-1;for(let i=0;i<Math.min(rows.length,40);i++){const r=rows[i].map(clean);if(r.includes('BRAND')&&r.includes('SUB BRAND')){h=i;break}}
+ if(h<0)return null;const hr=rows[h].map(clean),ib=hr.indexOf('BRAND'),is=hr.indexOf('SUB BRAND');let iv=hr.findIndex((x,j)=>j>is&&/\$|SALES/.test(x));if(iv<0)iv=is+1;
+ const out=[];for(let i=h+1;i<rows.length;i++){const r=rows[i];if(!r[ib]||typeof r[iv]!=='number')continue;out.push([clean(r[ib]),clean(r[is])||'*',Math.round(r[iv])])}
+ return out.length?{rows:out,label:String(rows[h-2]?.[0]||rows[h+1]?.[1]||'')}:null}
+function handleFiles(files){if(!files||!files.length)return;$('loading').classList.add('on');$('loadmsg').textContent='Reading '+files.length+' file(s)…';
+ let pending=files.length,msgs=[];
+ [...files].forEach(f=>{const rd=new FileReader();rd.onload=ev=>{setTimeout(()=>{try{
+   const wb=XLSX.read(ev.target.result,{type:'array',dense:true,cellStyles:false,cellHTML:false,cellText:false});
+   const acc={cube:{},prods:[],mkts:[],pers:{}};let used=false,longN=0,deckSeg=null;
+   for(const sn of wb.SheetNames){const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true,defval:''});
+    if(parseLong(rows,acc)){longN++;continue}
+    if(/by\s*period/i.test(sn)){deckSeg=parseDeckSegments(rows)||deckSeg;continue}
+    const U=parseUniverse(rows);if(U){ST.universe=U.rows;ST.uniFile=f.name;LS.set('hcp.universe',{rows:U.rows,file:f.name});used=true;msgs.push('Brand universe updated ('+U.rows.length+' lines)')}}
+   if(longN){loadCube(acc,f.name);used=true;msgs.push(`Loaded ${f.name} (${longN} data sheet${longN>1?'s':''}, ${acc.prods.length} lines, ${Object.keys(acc.pers).length} periods)`)}
+   if(deckSeg){ST.deckSeg=deckSeg;buildKB();msgs.push('Segment map read from deck')}
+   if(!used)msgs.push(f.name+': layout not recognised');
+  }catch(e){console.error(e);msgs.push(f.name+': '+e.message)}
+  if(--pending===0){$('loading').classList.remove('on');toast(msgs.join(' · '));render()}},30)};rd.readAsArrayBuffer(f)})}
+function loadCube(L,fname){ST.cube=L.cube;ST.prods=L.prods;ST.mkts=L.mkts;ST.file=fname;
+ const po=k=>({m:0,q:1,y:2,a:3}[k]??(k[0]==='c'?10-(+k.slice(1)||0)/1e4:20));
+ ST.pers=Object.entries(L.pers).map(([label,k])=>({label,k})).sort((a,b)=>po(a.k)-po(b.k));
+ L.prods.forEach(kb);
+ const nat=L.mkts.find(m=>/^NATIONAL EX NFLD GB \+DR \+MM$/.test(m))||L.mkts.slice().sort((a,b)=>(gv('MASS',b,'m','d')||0)-(gv('MASS',a,'m','d')||0))[0];
+ ST.nat=nat;ST.mkt=nat;ST.per=ST.pers.find(p=>p.k==='m')?'m':ST.pers[0].k;
+ // period label: 4-4-5 calendar position of the YTD period, else month name
+ const y=ST.pers.find(p=>p.k==='y'),m=ST.pers.find(p=>p.k==='m');let lab='';
+ const wk=y&&+(y.label.match(/(\d+)\s*w\/e/i)||[])[1];const cum=[4,8,13,17,21,26,30,34,39,43,47,52];
+ if(wk&&cum.includes(wk))lab='P'+(cum.indexOf(wk)+1);
+ const mon=m&&(m.label.match(/^([A-Za-z]{3,})\s*(\d{2})/)||[]);
+ ST.label=LS.get('hcp.label.'+(m?m.label:''),lab||(mon&&mon[1]?mon[1]+' '+mon[2]:'Latest period'));
+ ST.monthName=mon&&mon[1]?mon[1]+" '"+mon[2]:'';
+ ST.weekEnd=((m||y)?.label.match(/w\/e\s*([\d\/]+)/)||[])[1]||'';
+ ST.open=new Set(['MASS','CPD','WELLA','HENKEL','REST OF MARKET']);
+}
+
+/* ===================== metrics ===================== */
+function gv(p,m,k,f){return ST.cube?.[p]?.[m]?.[k]?.[f]}
+function raw(p,m,k){if(p==='REST OF MARKET'){const t=ST.cube?.MASS?.[m]?.[k];if(!t)return null;const o={d:t.d,u:t.u,dc:t.dc,uc:t.uc};
+  for(const b of BIG){const x=ST.cube?.[b]?.[m]?.[k];if(!x)continue;o.d-=x.d||0;o.u-=x.u||0;o.dc-=x.dc||0;o.uc-=x.uc||0}return o}
+ return ST.cube?.[p]?.[m]?.[k]||null}
+const MC=new Map();
+function get(p,m=ST.mkt,k=ST.per){const key=p+'|'+m+'|'+k;if(MC.has(key))return MC.get(key);
+ const r=raw(p,m,k);if(!r){MC.set(key,null);return null}
+ const T=raw('MASS',m,k)||{};const o={p,d:r.d||0,u:r.u||0,dc:r.dc,uc:r.uc};
+ if(o.dc==null&&fin(r.dp0))o.dc=o.d-o.d/(1+r.dp0/100);if(o.uc==null&&fin(r.up0))o.uc=o.u-o.u/(1+r.up0/100);
+ const noYA=T.dc==null||(T.d-T.dc)<=Math.abs(T.d)*0.02;o.hasYA=o.dc!=null&&!noYA;if(!o.hasYA){o.dc=null;o.uc=null}
+ o.dc=o.hasYA?o.dc??0:null;o.uc=o.hasYA?o.uc??0:null;o.dya=o.hasYA?o.d-o.dc:null;o.uya=o.uc!=null?o.u-o.uc:null;
+ o.dp=o.dya>0.5?o.dc/o.dya*100:null;o.up=o.uya>0.5?o.uc/o.uya*100:null;
+ const Td=T.d||0,Tu=T.u||0,Tdya=noYA?null:Td-T.dc,Tuya=noYA||T.uc==null?null:Tu-T.uc;
+ o.ds=Td?o.d/Td*100:null;o.us=Tu?o.u/Tu*100:null;o.dsya=Tdya&&fin(o.dya)?o.dya/Tdya*100:null;o.usya=Tuya&&fin(o.uya)?o.uya/Tuya*100:null;
+ o.dsc=fin(o.ds)&&fin(o.dsya)?o.ds-o.dsya:null;o.usc=fin(o.us)&&fin(o.usya)?o.us-o.usya:null;
+ o.ctg=T.dc?o.dc/Math.abs(T.dc)*100:null;
+ o.pr=o.u?o.d/o.u:null;const prya=o.uya>0?o.dya/o.uya:null;o.prp=fin(o.pr)&&prya?(o.pr/prya-1)*100:null;
+ o.isNew=o.hasYA&&o.d>0&&(o.dya<=Math.max(1,o.d*0.02));o.launch=o.hasYA&&o.d>0&&(o.isNew||(fin(o.dp)&&o.dp>=300));
+ o.delist=o.hasYA&&o.dya>0&&o.d<=o.dya*0.1;
+ MC.set(key,o);return o}
+const has=p=>!!ST.cube?.[p]||p==='REST OF MARKET';
+const perLabel=k=>{const p=ST.pers.find(x=>x.k===k);return p?p.label:k};
+const perShort=k=>k==='y'?'YTD':k==='q'?'L13W':k==='a'?'L52W':/^c\d{4}/.test(k)?k.slice(1):k==='m'?ST.label:k;
+function mshort(m){if(m===ST.nat)return'National';if(/ B&M$/.test(m))return'B&M';if(BANNERS[m])return BANNERS[m];
+ return tc(m.replace(/^NATIONAL EX NFLD /,'').replace(/ GB \+DR \+MM/,'').replace(/^GB \+DR \+MM /,'')).replace(/^E-commerce$/i,'E-Com').replace(/^Gb \+mm$/i,'Food & Mass').replace(/^Drug$/,'Drug')||m}
+function mlabel(m){if(m===ST.nat)return'National (GB+DR+MM)';const s=m.replace(/^NATIONAL EX NFLD GB \+DR \+MM /,'');
+ if(/^B&M$/.test(s))return'B&M (bricks & mortar)';if(/^E-COMMERCE$/.test(s))return'E-Commerce';if(m==='NATIONAL EX NFLD DRUG')return'National Drug';if(/ GB \+DR \+MM$/.test(m))return tc(m.replace(/ GB \+DR \+MM$/,''))+' (GB+DR+MM)';if(m==='NATIONAL EX NFLD GB +MM')return'National Food & Mass';return tc(m)}
+function mgroup(m){if(m===ST.nat)return'0 Total';if(/^NATIONAL/.test(m))return'1 Channels';if(/GB \+DR \+MM$/.test(m))return'3 Regions';if(/^SDM (?!NATIONAL)/.test(m))return'4 SDM regions';return'2 Banners & divisions'}
+const mB=()=>ST.mkts.find(m=>/ B&M$/.test(m)),mE=()=>ST.mkts.find(m=>/E-COMMERCE$/.test(m));
+
+/* ===================== analytics ===================== */
+const lineItems=()=>ST.prods.filter(p=>/^[FSB]$/.test(kb(p).l));
+function brandSet(){ // comparable brand-level players (no double counting)
+ const s=ST.prods.filter(p=>kb(p).l==='B'&&mfOf(p)!=='HENKEL');if(has('HENKEL'))s.push('HENKEL');return s}
+function segCands(sk){const all=(SEGMEM[sk]||[]).filter(p=>ST.cube?.[p]);const set=new Set(all);
+ return all.filter(p=>!ancestors(p).some(a=>set.has(a))&&!(kb(p).l==='XB'&&all.some(q=>q!==p&&kb(q).l!=='XB'&&kb(q).b===kb(p).b)))}
+function segNet(sk,brand){const xb=ST.prods.find(q=>kb(q).l==='XB'&&kb(q).p===SEGK[sk]?.row&&kb(q).b===brand);if(xb&&get(xb))return{dc:get(xb).dc,row:xb};
+ const ms=segCands(sk).filter(p=>kb(p).b===brand).map(p=>get(p)).filter(Boolean);return ms.length?{dc:ms.reduce((a,x)=>a+x.dc,0)}:null}
+function franchiseSet(){ // finest non-overlapping set for CTG ranking: franchise level (or brand when no franchise rows)
+ const items=ST.prods.filter(p=>{const e=kb(p);if(e.l==='F')return true;if(e.l==='B'){return !ST.prods.some(c=>kb(c).p===p&&/^[FS]$/.test(kb(c).l))}return false});
+ // got2b brand kept, its children dropped to avoid overlap with Henkel franchises? children are separate rows of GOT 2B, keep children instead
+ return items}
+const rankBy=(arr,f,dir=-1)=>arr.slice().sort((a,b)=>dir*((f(a)??-1e18)-(f(b)??-1e18)));
+function topBy(arr,f){let b=null,bv=-Infinity;for(const x of arr){const v=f(x);if(fin(v)&&v>bv){bv=v;b=x}}return b}
+function botBy(arr,f){let b=null,bv=Infinity;for(const x of arr){const v=f(x);if(fin(v)&&v<bv){bv=v;b=x}}return b}
+function rankOf(p,arr,f){const r=rankBy(arr.filter(x=>fin(f(x))),f);const i=r.indexOf(p);return i<0?null:i+1}
+function exclusivity(p){const ms=Object.keys(BANNERS).filter(m=>ST.mkts.includes(m));if(ms.length<3)return null;
+ const v=ms.map(m=>[m,get(p,m)?.d||0]);const tot=v.reduce((a,b)=>a+b[1],0);const nat=get(p,ST.nat)?.d||0;if(!tot||!nat)return null;
+ v.sort((a,b)=>b[1]-a[1]);const r=v[0][1]/tot;if(r>=0.9&&tot/nat>=0.4)return BANNERS[v[0][0]]+(r>=0.95?' only':' mainly');return null}
+const ord=n=>'#'+n;
+
+/* ===================== MONTHLY NOTE ===================== */
+function noteHTML(){
+ const k=ST.per,mk=ST.mkt,L=k==='m'?ST.label:perShort(k),M=get('MASS');if(!M)return'<p>No MASS line found for this market.</p>';
+ const Y=(k==='m'||k==='q')?get('MASS',mk,'y'):null,Q=get('MASS',mk,'q');const N='<span class="src">Nielsen</span>';
+ const mktName=mk===ST.nat?'':' in '+mlabel(mk);
+ const H=[];
+ H.push(`<h1>Hair Colour Monthly Note — ${esc(L)}${ST.monthName&&k==='m'?' ('+esc(ST.monthName)+')':''}</h1><div class="meta">Mass Hair Colour${esc(mktName)} · ${esc(perLabel(k))} · Source: NielsenIQ (${esc(ST.file)})</div>`);
+ /* ---- Category overview ---- */
+ H.push(`<h4>Category Overview <small>Source: Nielsen</small></h4>`);
+ let verb;if(M.dp>=0){verb=k==='m'&&Q&&Q!==M&&Q.dp<0?'bounced back to growth':k==='m'&&Q&&M.dp>Q.dp+1.5?'accelerated, growing':k==='m'&&Q&&M.dp<Q.dp-1.5?'grew, though slower than L13W,':'grew'}else{verb=k==='m'&&Q&&Q.dp>=0?'slipped into decline':'declined'}
+ const mix=fin(M.dp)&&fin(M.up)?M.dp-M.up:null;
+ H.push(`<p class="lead">In ${esc(L)}, Mass Hair Colour${esc(mktName)} ${verb} $ ${C(M.dp,sp(M.dp))}, with units ${M.up>=0?'up':'down'} ${C(M.up,sp(M.up))}${Y?` (YTD $ ${C(Y.dp,sp(Y.dp))}, U ${C(Y.up,sp(Y.up))})`:''}. ${fin(mix)&&Math.abs(mix)>=1.5?(mix>0?`Dollars outpaced units by ${f1(mix)} pts — growth is price/mix-led (avg $/unit ${sp(M.prp)}).`:`Units outpaced dollars by ${f1(-mix)} pts — avg $/unit ${sp(M.prp)}, signalling trade-down or deeper promo.`):'Dollar and unit trends are aligned.'}${N}</p><ul>`);
+ // CPD brands YTD / L13
+ const cmpK=k==='y'?'q':/^c\d{4}$/.test(k)?'c'+(+k.slice(1)-1):'y',cmpL=perShort(cmpK);
+ const cpdBr=['L OREAL PARIS','GARNIER'].filter(has);
+ if(cpdBr.some(b=>get(b,mk,cmpK)?.hasYA))H.push(`<li>${cpdBr.map(b=>{const x=get(b,mk,cmpK);return x?.hasYA?`<span class="k">${pretty(b)}</span> ${cmpL} (${du(x)})`:''}).join(' · ')}</li>`);
+ // channels
+ if(mk===ST.nat){for(const ch of [mB(),mE()].filter(Boolean)){const x=get('MASS',ch);if(!x)continue;
+  const bs=brandSet().map(b=>[b,get(b,ch)]).filter(a=>a[1]);const w=topBy(bs,a=>a[1].dc),l=botBy(bs,a=>a[1].dc);
+  H.push(`<li><span class="k">${mshort(ch)}</span> (${du(x)}, ${f1(x.d/M.d*100)}% of $) | ${esc(L)} | ${w?`<b>${pretty(w[0])}</b> biggest winner (${money(w[1].dc)}, ${sp(w[1].dp)})`:''}${l&&l[1].dc<0?` & <b>${pretty(l[0])}</b> biggest drainer (${money(l[1].dc)}, ${sp(l[1].dp)})`:''}</li>`)}}
+ // CPD
+ const cpd=get('CPD');if(cpd){const players=[...BIG.filter(has),...brandSet().filter(b=>mfOf(b)==='REST OF MARKET')];
+  const r=rankOf('CPD',players,p=>get(p)?.ds);
+  const ph=cpd.dp>=0&&cpd.up>=0?'grew $ and units':cpd.dp>=0?'lost units but grew $s':cpd.up>=0?'grew units but lost $s':'declined in $ and units';
+  H.push(`<li><span class="k">CPD</span> ${ph} and ${r===1?(cpd.ds>=50?'maintains market dominance':'remains the leader')+' as the #1 player':'is the #'+r+' player'} (${f1(cpd.ds)} $SHR ${C(cpd.dsc,spp(cpd.dsc))}, ${du(cpd)}, ${f1(cpd.ctg)}% CTG).${N}</li>`);
+  const brs=brandSet();const cb=cpdBr.map(b=>[b,get(b)]).filter(a=>a[1]).sort((a,b)=>b[1].dc-a[1].dc);
+  cb.forEach(([b,x],i)=>{const ctgR=rankOf(b,brs,p=>get(p)?.dc),shrR=rankOf(b,brs,p=>get(p)?.ds);
+   let s;if(i===0&&x.dc>0&&cb.length>1)s=`led growth for the division as ${ord(ctgR)} CTG`;
+   else if(x.dc>0)s=x.up<0?`(${ord(shrR)} player, ${ord(ctgR)} CTG) grew $ but lost units, limiting its growth`:`(${ord(shrR)} player) grew $ and units as ${ord(ctgR)} CTG`;
+   else s=x.up<0?`(${ord(shrR)} player) losing units, dragging on growth`:`(${ord(shrR)} player) gaining units but losing $s`;
+   H.push(`<li><span class="k">${pretty(b)}</span> ${s} ($SHR ${f1(x.ds)} ${C(x.dsc,spp(x.dsc))}, ${du(x)}, ${f1(x.ctg)}% CTG).${N}</li>`)});
+  const cf=franchiseSet().filter(isCPD).map(p=>[p,get(p)]).filter(a=>a[1]);const fs=franchiseSet();
+  const w=topBy(cf,a=>a[1].dc),l=botBy(cf,a=>a[1].dc);
+  if(w&&w[1].dc>0)H.push(`<li><span class="k">${fullName(w[0])}</span> was the biggest CPD driver at ${money(w[1].dc)} (${du(w[1])}, $SHR ${f1(w[1].ds)}, ${ord(rankOf(w[0],fs,p=>get(p)?.dc))} contributor to category growth).${N}</li>`);
+  if(l&&l[1].dc<0)H.push(`<li><span class="k">${fullName(l[0])}</span> was the biggest CPD drainer at ${money(l[1].dc)} (${du(l[1])}, $SHR ${f1(l[1].ds)} ${C(l[1].dsc,spp(l[1].dsc))}).${N}</li>`)}
+ H.push('</ul><hr>');
+ /* ---- Segments ---- */
+ const segs=SEGS.filter(s=>s.main&&has(s.row)).map(s=>{const x=get(s.row);if(!x)return null;const cs=segCands(s.k).map(p=>[p,get(p)]).filter(a=>a[1]);
+  const w=topBy(cs,a=>a[1].dc),l=botBy(cs,a=>a[1].dc);const c=s.cpd&&has(s.cpd)?get(s.cpd):null;
+  return{s,x,w:w&&w[1].dc>0?w:null,l:l&&l[1].dc<0?l:null,c,cshr:c&&x.d?c.d/x.d*100:null,cshrc:c&&x.d&&x.dya?c.d/x.d*100-c.dya/x.dya*100:null}}).filter(Boolean);
+ if(segs.length){H.push(`<h4>Segment Performance <small>${esc(L)} Nielsen MASS (${du(M)})</small></h4>`);
+  const win=segs.filter(g=>g.x.dp>=M.dp),lose=segs.filter(g=>!(g.x.dp>=M.dp));
+  const segLi=g=>`<li><span class="k">${g.s.name}</span> (${f1(g.x.ds)}% WOB, ${du(g.x)}) | ${g.w?`<b>${fullName(g.w[0])}</b> biggest winner (${money(g.w[1].dc)})`:'no clear winner'}${g.l?` & <b>${fullName(g.l[0])}</b> biggest drainer (${money(g.l[1].dc)})`:''}${fin(g.cshr)?` · CPD ${f1(g.cshr)}% of segment ${C(g.cshrc,'('+spp(g.cshrc)+')')}`:''}</li>`;
+  if(win.length)H.push(`<h5>Winning segments <span class="faint sm">(growing ≥ category)</span></h5><ul>${win.map(segLi).join('')}</ul>`);
+  if(lose.length)H.push(`<h5>Losing segments <span class="faint sm">(growing < category)</span></h5><ul>${lose.map(segLi).join('')}</ul>`);
+  H.push('<hr>')}
+ /* ---- Innovation ---- */
+ const items=lineItems().filter(p=>get(p));
+ let launches=items.filter(p=>get(p).launch&&(get(p).ds>=0.05||Math.abs(get(p).dc)>=10000));const lset=new Set(launches);launches=launches.filter(p=>!ST.prods.some(c=>lset.has(c)&&ancestors(c).includes(p)));
+ const fs=franchiseSet();
+ const ls=launches.reduce((a,p)=>a+get(p).d,0)/M.d*100,lc=launches.reduce((a,p)=>a+get(p).dc,0);
+ H.push(`<h4>Innovation Highlights <small>Source: Nielsen</small></h4>`);
+ H.push(`<p class="lead">In ${esc(L)}, launches (${launches.length} lines with little/no year-ago base) accounted for ${f1(ls)}% of Mass Hair Colour $, adding ${money(lc)} — ${fin(M.dc)&&M.dc>0?(lc>M.dc?'more than the category’s entire '+money(M.dc)+' $ gain (base business declined)':f1(lc/M.dc*100)+'% of category $ growth'):'vs a category change of '+money(M.dc)}.${N}</p>`);
+ const innoLine=p=>{const x=get(p),e=kb(p);const r=rankOf(p,fs.includes(p)?fs:[...fs,p],q=>get(q)?.dc);
+  let s=`<span class="k">${fullName(p)}</span>${x.launch?' <span class="pill p-new">'+(x.isNew?'NEW':'RELAUNCH')+'</span>':''} `;
+  s+=x.dc>=0?`was ${ord(r)} Contributor to Growth ($SHR ${f1(x.ds)}, USHR ${f1(x.us)}, ${f1(x.ctg)}% CTG)`:`declined ${money(x.dc)} ($SHR ${f1(x.ds)}, USHR ${f1(x.us)})`;
+  // incrementality: launch vs its brand's net change in the segment
+  const sk=segOf(p);const n=sk&&x.launch?segNet(sk,e.b):null;
+  if(n&&fin(n.dc)){const sib=segCands(sk).filter(q=>q!==p&&kb(q).b===e.b).map(q=>[q,get(q)]).filter(a=>a[1]);const worst=botBy(sib,a=>a[1].dc);const sn=SEGK[sk].name;
+   if(n.dc<0)s+=`; <b>not incremental</b> — ${BRANDPRETTY(e.b)} ${sn} net ${money(n.dc)}${worst&&worst[1].dc<0?` with ${pretty(worst[0])} ${worst[1].delist?'discontinuation':'decline'} (${money(worst[1].dc)})`:''}`;
+   else{const brands=[...new Set(segCands(sk).map(q=>kb(q).b))];const nets=brands.map(b=>segNet(sk,b)?.dc).filter(fin);
+    s+=n.dc>=Math.max(...nets)?`; largest net ${sn.toUpperCase()} contributor at ${money(n.dc)}`:`; brought ${money(n.dc)} net to ${BRANDPRETTY(e.b)} ${sn}`}}
+  else if(x.launch&&x.dc>0)s+=`; incremental ${money(x.dc)}`;
+  return`<li>${s}.</li>`};
+ const pick=(own)=>{const L1=launches.filter(p=>isCPD(p)===own);const top=rankBy(fs.filter(p=>isCPD(p)===own&&get(p)&&get(p).dc>0&&!L1.includes(p)&&!L1.some(c=>ancestors(c).includes(p))),p=>get(p).dc).slice(0,Math.max(0,4-L1.length));
+  return rankBy([...L1,...top],p=>get(p).dc).slice(0,5)};
+ H.push(`<h5>CPD Performance</h5><ul>${pick(true).map(innoLine).join('')||'<li class="mut">No CPD launches detected.</li>'}</ul>`);
+ H.push(`<h5>Competition Performance</h5><ul>${pick(false).map(innoLine).join('')||'<li class="mut">No competitor launches detected.</li>'}</ul><hr>`);
+ /* ---- Competition ---- */
+ H.push(`<h4>Competition Highlights <small>Source: Nielsen</small></h4>`);
+ const R=get('REST OF MARKET');
+ if(R)H.push(`<p class="lead">Rest of Market (excl. CPD, Wella, Henkel) ${R.dp>M.dp+2?'growing a lot faster than the category':R.dp>M.dp?'growing slightly ahead of the category':'lagging the category'} (${du(R)}, $SHR ${f1(R.ds)} ${C(R.dsc,spp(R.dsc))}).${N}</p>`);
+ H.push('<ul>');
+ for(const b of ['WELLA','HENKEL'].filter(has)){const x=get(b);const fr=franchiseSet().filter(p=>mfOf(p)===b).map(p=>[p,get(p)]).filter(a=>a[1]);const w=topBy(fr,a=>a[1].dc),l=botBy(fr,a=>a[1].dc);
+  H.push(`<li><span class="k">${pretty(b)}</span> ($SHR ${f1(x.ds)} ${C(x.dsc,spp(x.dsc))}, ${du(x)}, ${f1(x.ctg)}% CTG)${w&&w[1].dc>0?` | ${fullName(w[0])} leading (${money(w[1].dc)})`:''}${l&&l[1].dc<0?` | ${fullName(l[0])} biggest drainer (${money(l[1].dc)}${l[1].delist?', delisting':''})`:''}</li>`)}
+ const brs=brandSet(),comp=brs.filter(b=>!isCPD(b)&&b!=='HENKEL'&&b!=='CLAIROL');
+ const topC=rankBy(comp.filter(b=>get(b)?.dc>0),b=>get(b).dc).slice(0,3);
+ for(const b of topC){const x=get(b);const r=rankOf(b,brs,p=>get(p)?.dc);let ch='';
+  if(mk===ST.nat&&mE()&&mB()){const e=get(b,mE()),bm=get(b,mB());if(e&&bm)ch=` (E-Com $ ${C(e.dp,sp(e.dp))} & B&M $ ${C(bm.dp,sp(bm.dp))})`}
+  H.push(`<li><span class="k">${pretty(b)}</span>: the ${ord(r)} CTG brand growing $ ${C(x.dp,sp(x.dp))}${ch} @ ${f1(x.ctg)}% CTG ($SHR ${f1(x.ds)})</li>`)}
+ const mom=rankBy(comp.filter(b=>!topC.includes(b)&&get(b)&&get(b).ds>=1&&fin(get(b).dp)&&get(b).dp>M.dp+5),b=>get(b).dp)[0];
+ if(mom){const x=get(mom);H.push(`<li><span class="k">${pretty(mom)}</span>: strong run ($SHR ${f1(x.ds)}, $ ${C(x.dp,sp(x.dp))}, U ${C(x.up,sp(x.up))})</li>`)}
+ const dr=botBy(comp.map(b=>[b,get(b)]).filter(a=>a[1]),a=>a[1].dc);
+ if(dr&&dr[1].dc<0)H.push(`<li><span class="k">${pretty(dr[0])}</span>: biggest competitor drainer at ${money(dr[1].dc)} (${du(dr[1])}, $SHR ${f1(dr[1].ds)})</li>`);
+ if(mk===ST.nat){const ex=rankBy(comp.map(b=>[b,exclusivity(b)]).filter(a=>a[1]&&get(a[0])?.ds>=0.1),a=>Math.abs(get(a[0]).ctg||0)).slice(0,4);
+  if(ex.length)H.push(`<li><span class="k">Note on retailer-exclusive brands:</span> ${ex.map(([b,ban])=>{const x=get(b);return`${pretty(b)} (${ban}) $ ${C(x.dp,sp(x.dp))}, ${f1(x.ctg)}% CTG${x.ds<0.5?', but only '+f1(x.ds)+' $SHR':', $SHR '+f1(x.ds)}`}).join('. ')}.</li>`)}
+ H.push('</ul><hr>');
+ /* ---- So what ---- */
+ H.push(`<h4>So What — Implications for CPD <small>Auto-generated</small></h4><ul>`);
+ if(cpd){H.push(`<li>CPD ${cpd.dsc>=0?'gained':'lost'} <b>${f1(Math.abs(cpd.dsc))} pts</b> of $ share${mktName} (now ${f1(cpd.ds)}%). Avg $/unit ${sp(cpd.prp)} vs category ${sp(M.prp)}${fin(cpd.prp)&&fin(M.prp)?(cpd.prp>M.prp+1?' — CPD is pricing ahead of the market; watch unit elasticity.':cpd.prp<M.prp-1?' — CPD is pricing below the market trend.':' — in line with the market.'):''}</li>`);
+  if(mk===ST.nat){const mm=ST.mkts.filter(m=>m!==ST.nat&&get('MASS',m)&&get('MASS',m).d>=M.d*0.03&&get('CPD',m));const sh=mm.map(m=>[m,get('CPD',m).dsc]).filter(a=>fin(a[1])).sort((a,b)=>a[1]-b[1]);
+   if(sh.length){const lo=sh.slice(0,3).filter(a=>a[1]<0),hi=sh.slice(-3).reverse().filter(a=>a[1]>0);
+    if(hi.length)H.push(`<li>Share gains strongest in ${hi.map(a=>`<b>${mshort(a[0])}</b> ${C(a[1],spp(a[1]))}`).join(', ')}.</li>`);
+    if(lo.length)H.push(`<li>Share losses concentrated in ${lo.map(a=>`<b>${mshort(a[0])}</b> ${C(a[1],spp(a[1]))}`).join(', ')} — priority for activation/promo review.</li>`)}}
+  const sg=segs.filter(g=>fin(g.cshrc));if(sg.length){const a=sg.slice().sort((x,y)=>y.cshrc-x.cshrc);
+   H.push(`<li>Segment share: CPD ${a[0].cshrc>=0?'gaining':'losing'} most in <b>${a[0].s.name}</b> ${C(a[0].cshrc,spp(a[0].cshrc))}${a.length>1?`; weakest in <b>${a[a.length-1].s.name}</b> ${C(a[a.length-1].cshrc,spp(a[a.length-1].cshrc))}`:''}.</li>`)}
+  if(topC[0]){const x=get(topC[0]);H.push(`<li>Biggest competitive threat: <b>${pretty(topC[0])}</b> took ${f1(x.ctg)}% of category growth${x.dsc>0?` (+${f1(x.dsc)} pts share)`:''}.</li>`)}
  }
- return out}
-/* layout B: markets across (By Market) */
-function parseByMarket(rows){
- const c=rows.map(r=>r.map(x=>x==null?'':String(x)));
- let s=-1;for(let i=1;i<c.length;i++){if(c[i].filter(x=>/shr/i.test(x)).length>=2){s=i;break}}
- if(s<1)return null;
- const sub=c[s],head=c[s-1],cols=[];
- sub.forEach((x,j)=>{if(/shr/i.test(x)){const n=(head[j]||'').trim()||(head[j+1]||'').trim()||(head[j-1]||'').trim();cols.push({j,n:n||'Market '+(cols.length+1)})}});
- let label='Current period';
- for(let i=0;i<=s;i++){if(/^\s*period/i.test(c[i][0])){const v=c[i].slice(1).find(x=>x.trim());if(v)label=v.trim();break}}
- const out=[];
- for(let i=s+1;i<c.length;i++){const raw=c[i][0],name=raw.trim();if(!name)continue;
-  const v=cols.map(({j})=>({shr:num(c[i][j]),chg:num(c[i][j+1])}));
-  if(v.every(x=>x.shr==null&&x.chg==null))continue;
-  out.push({name,ind:raw.match(/^\s*/)[0].length,v})}
- return out.length?{label,markets:cols.map(x=>x.n),rows:out}:null}
+ H.push('</ul>');
+ H.push(`<p class="faint sm" style="margin-top:18px">Definitions: WOB = segment $ weight of business in Mass HC · CTG = item $ change ÷ |category $ change| · $SHR/USHR = $ / unit share of Mass HC · pts = share change vs year ago · Launch = little/no year-ago sales or ≥ +300% growth. Atlas360 and promo data are not in the Nielsen file — add them manually where needed.</p>`);
+ return H.join('')}
+function renderNote(){
+ const app=$('app');
+ app.innerHTML=`<div class="notewrap"><div><div class="paper" id="paper" contenteditable="true" spellcheck="false">${noteHTML()}</div></div>
+ <div class="side noprint"><div class="card pad"><h3>Note controls</h3>
+  <div class="hint">The note regenerates when you change period or market. Click into the page to edit text before copying.</div>
+  <label class="sm mut" style="display:block;margin-bottom:10px">Period label<br><input type="text" id="plabel" value="${esc(ST.label)}" style="width:100%"></label>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" id="copy">Copy note</button><button class="btn" id="print">Print / PDF</button><button class="btn" id="regen">Reset edits</button></div></div>
+  <div class="card pad"><h3>Scorecard</h3><div id="score"></div></div>
+  <div class="card pad"><h3>What feeds the note</h3><ul class="sm mut"><li>Category, channels and CPD lines come from MASS, B&M, E-Com, CPD and brand rows.</li><li>Segment winners/drainers use the franchise → segment map in <b>Knowledge</b> (editable).</li><li>Launches are lines with no/low year-ago base or ≥ +300%.</li><li>Retailer exclusives come from banner distribution (≥85% in one banner).</li></ul></div></div></div>`;
+ $('plabel').onchange=e=>{ST.label=e.target.value||ST.label;const m=ST.pers.find(p=>p.k==='m');LS.set('hcp.label.'+(m?m.label:''),ST.label);renderNote()};
+ $('regen').onclick=()=>{$('paper').innerHTML=noteHTML();toast('Note regenerated')};
+ $('print').onclick=()=>print();
+ $('copy').onclick=async()=>{const el=$('paper');const html=`<div style="font-family:Arial,sans-serif;font-size:11pt">${el.innerHTML.replace(/<span class="src">/g,'<span style="color:#2b59e6;font-size:8pt">[').replace(/Nielsen<\/span>/g,'Nielsen]</span>').replace(/class="pos"/g,'style="color:#16833c"').replace(/class="neg"/g,'style="color:#d12c3a"')}</div>`;
+  try{await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([el.innerText],{type:'text/plain'})})]);toast('Copied — paste into email, Word or PowerPoint')}
+  catch(e){const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);document.execCommand('copy');s.removeAllRanges();toast('Copied')}};
+ const rows=[['Mass HC','MASS'],['CPD','CPD'],["L'Oréal Paris",'L OREAL PARIS'],['Garnier','GARNIER'],['Wella (Clairol)','WELLA'],['Henkel','HENKEL'],['Rest of Market','REST OF MARKET']].filter(r=>has(r[1])&&get(r[1]));
+ $('score').innerHTML=`<table><tr><th></th><th>$SHR</th><th>$ %</th><th>U %</th></tr>${rows.map(([n,p])=>{const x=get(p);return`<tr><td>${n}</td><td>${f1(x.ds)}</td><td class="${cls(x.dp)}">${sp(x.dp)}</td><td class="${cls(x.up)}">${sp(x.up)}</td></tr>`}).join('')}</table>`}
 
-function ingest(blocks,bm){M={};blocks.forEach(b=>{let n=b.name,i=2;while(M[n])n=b.name+' ('+i++ +')';M[n]=b});BM=bm;
- if(!Object.keys(M).length&&!BM){alert('No Nielsen layout found. Expected either a period header row (2024 / 2025 / YTD / Latest 13 Wks / Latest Period) or a market header with "$ Shr - Product" / "$ % Chg YA" pairs.');return}
- const nm=Object.keys(M).length,parts=[];
- if(BM)parts.push(BM.markets.length+' markets · '+BM.label);
- if(nm)parts.push(nm+' period-view market(s)');
- $('sub').textContent=(fileName?fileName+' · ':'')+parts.join(' · ');
- RS={i:null,dir:1};init()}
-function handleFile(f){if(!f)return;fileName=f.name;const rd=new FileReader();
- rd.onload=ev=>{const wb=XLSX.read(ev.target.result,{type:'array'});let all=[],cands=[];
-  wb.SheetNames.forEach(n=>{const rows=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:false,defval:''});
-   const b=parseRows(rows,n);if(b.length){all=all.concat(b)}else{const bm=parseByMarket(rows);if(bm)cands.push({n,bm})}});
-  const pick=cands.find(x=>/by\s*market/i.test(x.n))||cands.find(x=>!/pull/i.test(x.n))||null;
-  ingest(all,pick?pick.bm:null)};rd.readAsArrayBuffer(f)}
-$('file').onchange=e=>handleFile(e.target.files[0]);
-addEventListener('dragover',e=>{e.preventDefault();document.body.classList.add('dragging')});
-addEventListener('dragleave',e=>{if(!e.relatedTarget)document.body.classList.remove('dragging')});
-addEventListener('drop',e=>{e.preventDefault();document.body.classList.remove('dragging');handleFile(e.dataTransfer.files[0])});
-function loadPaste(){const rows=$('pt').value.split(/\r?\n/).map(l=>l.split('\t'));pd.close();fileName='Pasted data';
- const b=parseRows(rows,'Pasted market');ingest(b,b.length?null:parseByMarket(rows))}
+/* ===================== OVERVIEW ===================== */
+const charts={};function kill(){for(const k in charts){charts[k].destroy();delete charts[k]}}
+function chartBase(){Chart.defaults.color=css('--mut');Chart.defaults.font.family='Inter,system-ui,sans-serif';Chart.defaults.borderColor=css('--grid')}
+function renderOverview(){kill();chartBase();const M=get('MASS');if(!M){$('app').innerHTML='<p>No MASS line.</p>';return}
+ const cpd=get('CPD');const Y=get('MASS',ST.mkt,'y');
+ const kp=(n,v,c,sub)=>`<div class="card pad kpi"><div class="n">${n}</div><div class="v">${v}</div><div class="c">${c}</div>${sub?`<div class="sm mut" style="margin-top:6px">${sub}</div>`:''}</div>`;
+ $('app').innerHTML=`<div class="hint">${esc(mlabel(ST.mkt))} · ${esc(perLabel(ST.per))}</div>
+ <div class="grid g4" style="margin-bottom:14px">
+  ${kp('Mass HC $','$'+big(M.d),`${C(M.dp,sp(M.dp))} vs YA <span class="mut">(${money(M.dc)})</span>`,Y&&ST.per!=='y'?`YTD ${C(Y.dp,sp(Y.dp))}`:'')}
+  ${kp('Units',big(M.u),`${C(M.up,sp(M.up))} vs YA`,Y&&ST.per!=='y'?`YTD ${C(Y.up,sp(Y.up))}`:'')}
+  ${kp('Avg $ / unit','$'+(M.pr||0).toFixed(2),`${C(M.prp,sp(M.prp))} vs YA`,'Price/mix')}
+  ${cpd?kp('CPD $ share',f1(cpd.ds)+'%',`${C(cpd.dsc,spp(cpd.dsc))} vs YA`,`CPD $ ${C(cpd.dp,sp(cpd.dp))} · ${f1(cpd.ctg)}% CTG`):''}
+ </div>
+ <div class="grid g2" style="margin-bottom:14px">
+  <div class="card pad"><h3>Share of Mass HC — players</h3><div class="chartbox"><canvas id="c1"></canvas></div></div>
+  <div class="card pad"><h3>Growth by player — ${esc(perShort(ST.per))} vs L13W vs YTD ($ % chg)</h3><div class="chartbox"><canvas id="c2"></canvas></div></div>
+ </div>
+ <div class="grid g2" style="margin-bottom:14px">
+  <div class="card pad"><h3>Top contributors & drainers ($ chg vs YA, franchise level)</h3><div class="chartbox" style="height:420px"><canvas id="c3"></canvas></div></div>
+  <div class="card pad"><h3>Channels</h3><div id="chan"></div><h3 style="margin-top:18px">Segments (WOB & growth)</h3><div id="segbars" class="bars"></div></div>
+ </div>
+ ${ST.pers.length>3?`<div class="card pad"><h3>$ share trend — history to current</h3><div class="chartbox"><canvas id="c4"></canvas></div></div>`:''}`;
+ const pl=['L OREAL PARIS','GARNIER','CLAIROL','HENKEL',...rankBy(brandSet().filter(b=>mfOf(b)==='REST OF MARKET'),b=>get(b)?.d).slice(0,5)].filter(p=>has(p)&&get(p));
+ const rest=M.d-pl.reduce((a,p)=>a+get(p).d,0);
+ const pal=['#2b59e6','#5b8def','#e0457b','#f59e0b','#10b981','#8b5cf6','#06b6d4','#a3a3a3','#ef4444','#84cc16'];
+ charts.c1=new Chart($('c1'),{type:'doughnut',data:{labels:[...pl.map(pretty),'All other'],datasets:[{data:[...pl.map(p=>get(p).ds),rest/M.d*100],backgroundColor:[...pal.slice(0,pl.length),css('--bd')],borderColor:css('--card'),borderWidth:2}]},options:{maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right',labels:{boxWidth:10}},tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw.toFixed(1)}%`}}}}});
+ const gp=['MASS','CPD','L OREAL PARIS','GARNIER','WELLA','HENKEL','REST OF MARKET'].filter(has);
+ const ks=['m','q','y'].filter(k=>ST.pers.some(p=>p.k===k));
+ charts.c2=new Chart($('c2'),{type:'bar',data:{labels:gp.map(p=>p==='MASS'?'Mass':pretty(p).replace(' (Schwarzkopf)','').replace(' (Clairol)','')),datasets:ks.map((k,i)=>({label:perShort(k),data:gp.map(p=>get(p,ST.mkt,k)?.dp),backgroundColor:['#2b59e6','#93a9f5','#cfd8fb'][i],borderRadius:4}))},options:{maintainAspectRatio:false,plugins:{legend:{labels:{boxWidth:10}}},scales:{y:{ticks:{callback:v=>v+'%'}}}}});
+ const fs=franchiseSet().map(p=>[p,get(p)]).filter(a=>a[1]);const top=rankBy(fs,a=>a[1].dc).slice(0,8),bot=rankBy(fs,a=>a[1].dc,1).slice(0,8).reverse();
+ const arr=[...top,...bot.filter(b=>!top.includes(b))];
+ charts.c3=new Chart($('c3'),{type:'bar',data:{labels:arr.map(a=>fullName(a[0])),datasets:[{data:arr.map(a=>a[1].dc/1000),backgroundColor:arr.map(a=>isCPD(a[0])?(a[1].dc>=0?'#2b59e6':'#93a9f5'):(a[1].dc>=0?'#10b981':'#ef4444')),borderRadius:3}]},options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${money(c.raw*1000)} · $ ${sp(arr[c.dataIndex][1].dp)}`}}},scales:{x:{ticks:{callback:v=>v+'k'}}}}});
+ const chs=ST.mkts.filter(m=>mgroup(m)==='1 Channels');
+ $('chan').innerHTML=`<div class="tw"><table><tr><th>Channel</th><th>% of $</th><th>$ %</th><th>U %</th><th>CPD $SHR</th><th>pts</th></tr>${[ST.nat,...chs].map(m=>{const x=get('MASS',m),c=get('CPD',m);if(!x)return'';const N=get('MASS',ST.nat);return`<tr><td>${mlabel(m)}</td><td>${f1(x.d/N.d*100)}</td><td class="${cls(x.dp)}">${sp(x.dp)}</td><td class="${cls(x.up)}">${sp(x.up)}</td><td>${c?f1(c.ds):''}</td><td class="${cls(c?.dsc)}">${c?spp(c.dsc):''}</td></tr>`}).join('')}</table></div><div class="faint sm" style="margin-top:4px">Channel rows always vs national; select a market above to re-base the rest of the page.</div>`;
+ const sg=SEGS.filter(s=>has(s.row)).map(s=>[s,get(s.row)]).filter(a=>a[1]);const mx=Math.max(...sg.map(a=>a[1].ds));
+ $('segbars').innerHTML=sg.map(([s,x])=>`<div class="row"><div>${s.name}</div><div class="track"><div class="fill" style="left:0;width:${x.ds/mx*100}%;background:${x.dp>=M.dp?'var(--pos)':'var(--neg)'};opacity:.55"></div></div><div class="${cls(x.dp)}" style="text-align:right">${f1(x.ds)}% · ${sp(x.dp)}</div></div>`).join('')+`<div class="faint sm">Bar = WOB; green = growing ≥ category (${sp(M.dp)}).</div>`;
+ if($('c4')){const hk=[...ST.pers.filter(p=>p.k[0]==='c').map(p=>p.k).sort(),...['y','q','m'].filter(k=>ST.pers.some(p=>p.k===k))];
+  const tp=['CPD','L OREAL PARIS','GARNIER','WELLA','HENKEL','REST OF MARKET'].filter(has);
+  charts.c4=new Chart($('c4'),{type:'line',data:{labels:hk.map(perShort),datasets:tp.map((p,i)=>({label:pretty(p),data:hk.map(k=>get(p,ST.mkt,k)?.ds??null),borderColor:pal[i],backgroundColor:pal[i],tension:.25,spanGaps:true}))},options:{maintainAspectRatio:false,plugins:{legend:{labels:{boxWidth:10}}},scales:{y:{ticks:{callback:v=>v+'%'}}}}})}}
 
-/* ---------- FLAGS (period view) ---------- */
-function flags(r,pk){
- const p=r.p[pk]||{},a=r.p.ytd||{},b=r.p.l13||{},o=[];
- const big=(p.shr||0)>=S.minShr||Math.abs(p.d||0)>=S.minD*2;if(!big||p.chg==null&&p.d==null&&pk!=='lp')return o;
- if(p.chg!=null&&p.d!=null){
-  if(p.chg<=-S.decl&&p.d<=-S.minD)o.push({c:'neg',t:'Losing'});
-  if(p.chg>=S.grow&&p.d>=S.minD)o.push({c:'pos',t:'Surging'})}
- if(pk==='lp'||pk==='l13'){
-  if(a.chg!=null&&p.chg!=null){if(a.chg>0&&p.chg<0&&Math.abs(p.d||0)>=S.minD/2)o.push({c:'warn',t:'Turned negative'});
-   if(a.chg<0&&p.chg>0&&Math.abs(p.d||0)>=S.minD/2)o.push({c:'pos',t:'Turned positive'})}
-  const base=pk==='lp'?b:a;if(base.chg!=null&&p.chg!=null&&Math.abs(p.d||0)>=S.minD/2){
-   const dd=p.chg-base.chg;if(dd>=S.swing)o.push({c:'info',t:'Accelerating'});if(dd<=-S.swing)o.push({c:'warn',t:'Decelerating'})}}
- if(!(r.p.y25&&r.p.y25.shr)&&p.shr>0&&r.p.ytd)o.push({c:'info',t:'New'});
- return o}
-const pill=f=>`<span class="pill p-${f.c}">${f.t}</span>`;
-const ARR=m=>M[m].sections.flatMap(s=>s.rows);
-const fc=x=>x&&x.chg!=null&&(x.shr||0)>=S.minShr?(x.chg<=-S.decl?'cf-neg':x.chg>=S.grow?'cf-pos':''):'';
+/* ===================== SEGMENTS ===================== */
+function renderSegments(){const M=get('MASS');const subs=ST.prods.filter(p=>kb(p).l==='X'||kb(p).l==='XM');
+ const segCard=s=>{const x=get(s.row);if(!x)return'';const cs=rankBy(segCands(s.k).map(p=>[p,get(p)]).filter(a=>a[1]&&a[1].d+Math.abs(a[1].dc)>0),a=>a[1].dc);
+  const xb=ST.prods.filter(p=>kb(p).l==='XB'&&kb(p).p===s.row).map(p=>[p,get(p)]).filter(a=>a[1]);const c=s.cpd&&get(s.cpd);
+  const kids=subs.filter(p=>kb(p).p===s.row&&kb(p).l==='X').map(p=>[p,get(p)]).filter(a=>a[1]);
+  const covered=cs.reduce((a,b)=>a+b[1].d,0)/x.d*100;
+  return`<div class="card pad"><h3 style="display:flex;justify-content:space-between"><span>${s.name}</span><span class="${cls(x.dp)}">${sp(x.dp)}</span></h3>
+  <div class="sm mut">WOB ${f1(x.ds)}% · U ${sp(x.up)} · ${money(x.dc)} · ${f1(x.ctg)}% CTG${c?` · CPD ${f1(c.d/x.d*100)}% of segment`:''}</div>
+  ${kids.length?`<div class="sm" style="margin:8px 0">${kids.map(([p,y])=>`<span class="tag">${pretty(p)} ${f1(y.d/x.d*100)}% · <span class="${cls(y.dp)}">${sp(y.dp)}</span></span>`).join(' ')}</div>`:''}
+  ${xb.length?`<div class="tw" style="margin:10px 0"><table><tr><th>Brand in segment</th><th>% seg</th><th>$ %</th><th>U %</th><th>$ chg</th></tr>${rankBy(xb,a=>a[1].d).map(([p,y])=>`<tr class="${isCPD(kb(p).b)?'cpd':''}"><td>${pretty(p)}</td><td>${f1(y.d/x.d*100)}</td><td class="${cls(y.dp)}">${sp(y.dp)}</td><td class="${cls(y.up)}">${sp(y.up)}</td><td class="${cls(y.dc)}">${money(y.dc)}</td></tr>`).join('')}</table></div>`:''}
+  <div class="tw" style="max-height:340px"><table><tr><th>Franchise</th><th>% seg</th><th>$ %</th><th>$ chg</th><th>seg CTG</th></tr>${cs.map(([p,y])=>`<tr class="${isCPD(p)?'cpd':''}"><td>${fullName(p)} ${y.launch?'<span class="pill p-new">NEW</span>':''}${y.delist?'<span class="pill p-warn">DELIST</span>':''}</td><td>${f1(y.d/x.d*100)}</td><td class="${cls(y.dp)}">${sp(y.dp)}</td><td class="${cls(y.dc)}">${money(y.dc)}</td><td>${x.dc?f1(y.dc/Math.abs(x.dc)*100)+'%':''}</td></tr>`).join('')}</table></div>
+  <div class="faint sm" style="margin-top:6px">Mapped franchises cover ${f1(covered)}% of segment $. Edit mapping in Knowledge.</div></div>`};
+ $('app').innerHTML=`<div class="hint">${esc(mlabel(ST.mkt))} · ${esc(perLabel(ST.per))} · Category ${du(M)}</div><div class="seglist">${SEGS.filter(s=>has(s.row)).map(segCard).join('')}</div>
+ <div class="card pad" style="margin-top:14px"><h3>All segment lines in file</h3><div class="tw"><table><tr><th>Segment line</th><th>WOB</th><th>$ %</th><th>U %</th><th>$ chg</th><th>CTG</th><th>YTD $ %</th></tr>${subs.map(p=>{const y=get(p),yy=get(p,ST.mkt,'y');if(!y)return'';return`<tr class="${kb(p).l==='XM'?'cpd':''}"><td>${pretty(p)}</td><td>${f1(y.ds)}</td><td class="${cls(y.dp)}">${sp(y.dp)}</td><td class="${cls(y.up)}">${sp(y.up)}</td><td class="${cls(y.dc)}">${money(y.dc)}</td><td>${f1(y.ctg)}%</td><td class="${cls(yy?.dp)}">${yy?sp(yy.dp):''}</td></tr>`}).join('')}</table></div></div>`}
 
-/* ---------- UI SHELL ---------- */
-const hasM=()=>Object.keys(M).length>0;
-function init(){
- $('app').innerHTML=`<div class="filters in" id="bar"></div><div id="view"></div>`;
- const ms=Object.keys(M);let po;
- if(hasM()){const lab=M[ms[0]].labels;po=PK.slice(2).reverse().map(([k,l])=>`<option value="${k}">${esc(lab[k]||l)}</option>`).join('')}
- else po=`<option value="lp">${esc(BM.label)}</option>`;
- $('bar').innerHTML=`<span id="mkw" style="display:contents"><span class="t">Market</span><select id="mk" onchange="draw()">${ms.map(m=>`<option>${esc(m)}</option>`).join('')}</select></span>
- <span class="t">Period</span><select id="pk" onchange="draw()">${po}</select>
- <label class="chk" id="ownw"><input type="checkbox" id="ownOnly" checked onchange="draw()"> Own brands</label>`;
- draw()}
-function sets(){const f=[['minShr','Min share (pts)'],['decl','Decline % ≥'],['grow','Growth % ≥'],['minD','Min $ change'],['swing','Swing (pts)']];
- $('set').innerHTML=f.map(([k,l])=>`<label>${l}<input type="number" step="any" value="${S[k]}" onchange="S['${k}']=+this.value;save()"></label>`).join('')+
- `<label class="wide">Own-brand list (comma separated)<input value="${esc(S.own)}" onchange="S.own=this.value;save()"></label>`}
-function save(){localStorage.setItem('hcset',JSON.stringify(S));if(BM||hasM())draw()}
-document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));moveThumb();if(BM||hasM())draw()});
-function draw(){Object.values(charts).forEach(c=>c.destroy());charts={};chartBase();
- $('mkw').style.display=(tab==='ov'||tab==='ex')?'contents':'none';
- $('ownw').style.display=tab==='ov'?'flex':'none';
- if((tab==='ov'||tab==='ex')&&!hasM()){$('view').innerHTML=`<div class="glass panel in"><h3>This view needs period data</h3><div class="note">Your file only contains the By Market layout (one period). Include the By Period sheet, or the raw pull, to unlock Flags and Explorer across 2024 / 2025 / YTD / 13 weeks / latest period.</div></div>`;return}
- const m=hasM()?$('mk').value:null,pk=$('pk').value;
- ({rc:recapView,ov:overview,ex:explorer,mk:compare}[tab])(m,pk)}
+/* ===================== BRANDS (tree explorer) ===================== */
+function children(p){if(p==='MASS')return['CPD','WELLA','HENKEL','REST OF MARKET'].filter(has);
+ return ST.prods.filter(c=>{const e=kb(c);return e.p===p&&/^[BFS]$/.test(e.l)})}
+const COLS=[['d','$',x=>'$'+big(x.d)],['ds','$SHR',x=>f1(x.ds)],['dsc','± pts',x=>`<span class="${cls(x.dsc)}">${spp(x.dsc)}</span>`],['dp','$ %',x=>`<span class="${cls(x.dp)}">${x.isNew?'NEW':sp(x.dp)}</span>`],['up','U %',x=>`<span class="${cls(x.up)}">${x.isNew?'NEW':sp(x.up)}</span>`],['dc','$ chg',x=>`<span class="${cls(x.dc)}">${money(x.dc)}</span>`],['ctg','CTG',x=>f1(x.ctg)+'%'],['us','USHR',x=>f1(x.us)],['prp','$/unit %',x=>`<span class="${cls(x.prp)}">${sp(x.prp)}</span>`],['ydp','YTD $ %',(x,p)=>{const y=get(p,ST.mkt,'y');return y?`<span class="${cls(y.dp)}">${sp(y.dp)}</span>`:''}]];
+function flagsOf(x){const o=[];if(x.isNew)o.push('<span class="pill p-new">NEW</span>');else if(x.launch)o.push('<span class="pill p-new">RELAUNCH</span>');if(x.delist)o.push('<span class="pill p-warn">DELIST</span>');
+ if(!x.isNew&&x.ds>=0.3&&fin(x.dp)){if(x.dp>=10&&x.dc>0)o.push('<span class="pill p-pos">SURGING</span>');if(x.dp<=-10&&x.dc<0&&!x.delist)o.push('<span class="pill p-neg">LOSING</span>')}return o.join('')}
+function renderBrands(){const q=ST.q.trim().toUpperCase();let rows=[];
+ const sk=ST.sort.k,dir=ST.sort.dir;const sv=p=>{const x=get(p);if(!x)return-1e18;return sk==='ydp'?(get(p,ST.mkt,'y')?.dp??-1e18):(x[sk]??-1e18)};
+ const match=p=>!q||p.includes(q)||pretty(p).toUpperCase().includes(q)||fullName(p).toUpperCase().includes(q);
+ const subtreeMatch=p=>match(p)||children(p).some(subtreeMatch);
+ const walk=(p,lv)=>{const x=get(p);if(!x)return;if(q&&!subtreeMatch(p))return;const kids=children(p).filter(c=>get(c));
+  rows.push({p,lv,x,kids:kids.length});if((ST.open.has(p)||q)&&kids.length)rankBy(kids,sv,dir).forEach(c=>walk(c,lv+1))};
+ walk('MASS',0);
+ $('app').innerHTML=`<div class="ctl noprint" style="margin-bottom:10px"><input type="search" id="q" placeholder="Search brand or franchise…" value="${esc(ST.q)}" style="width:260px"><button class="btn sm" id="xall">Expand all</button><button class="btn sm" id="call">Collapse</button><span class="hint" style="margin:0">${esc(mlabel(ST.mkt))} · ${esc(perLabel(ST.per))} · click headers to sort · blue bar = CPD</span></div>
+ <div class="tw"><table><thead><tr><th data-k="name">Brand / franchise</th>${COLS.map(c=>`<th data-k="${c[0]}">${c[1]}${ST.sort.k===c[0]?(dir<0?' ↓':' ↑'):''}</th>`).join('')}<th>Flags</th></tr></thead><tbody>${rows.map(r=>`<tr class="lv${Math.min(r.lv,2)} ${isCPD(r.p)?'cpd':''}"><td style="padding-left:${10+r.lv*18}px"><span class="tree" data-p="${esc(r.p)}">${r.kids?(ST.open.has(r.p)||q?'▾':'▸'):''}</span>${esc(r.lv>=2&&kb(r.p).l!=='B'?pretty(r.p):pretty(r.p))}</td>${COLS.map(c=>`<td>${c[2](r.x,r.p)}</td>`).join('')}<td class="l">${flagsOf(r.x)}</td></tr>`).join('')}</tbody></table></div>`;
+ $('q').oninput=e=>{ST.q=e.target.value;const pos=e.target.selectionStart;renderBrands();const n=$('q');n.focus();n.setSelectionRange(pos,pos)};
+ $('xall').onclick=()=>{ST.prods.forEach(p=>ST.open.add(p));ST.open.add('REST OF MARKET');renderBrands()};
+ $('call').onclick=()=>{ST.open=new Set(['MASS']);renderBrands()};
+ document.querySelectorAll('.tree').forEach(t=>t.onclick=()=>{const p=t.dataset.p;ST.open.has(p)?ST.open.delete(p):ST.open.add(p);renderBrands()});
+ document.querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(k==='name')return;ST.sort=ST.sort.k===k?{k,dir:-ST.sort.dir}:{k,dir:-1};renderBrands()})}
 
-/* ---------- RECAP (Excel "By Market" replica) ---------- */
-function recap(pk){
- const ms=Object.keys(M);
- if(BM&&(!ms.length||(ms.length<2&&pk==='lp')))return{label:BM.label,markets:BM.markets,rows:BM.rows};
- const base=M[ms[0]].sections[0].rows;
- return{label:M[ms[0]].labels[pk]||pk,markets:ms,rows:base.map(r=>({name:r.name,ind:r.ind,v:ms.map(mn=>{const x=M[mn].sections[0].rows.find(q=>norm(q.name)===norm(r.name));return x&&x.p[pk]?x.p[pk]:{}})}))}}
-function sortM(i){if(RS.i===i){if(RS.dir===1)RS.dir=-1;else RS.i=null}else{RS.i=i;RS.dir=1}draw()}
-function recapView(m,pk){
- const R=recap(pk),lv=levels(R.rows);let idx=R.rows.map((_,i)=>i);
- const q=($('rq')||{}).value||'',fo=($('rfo')||{}).checked,fl=!$('rfl')||$('rfl').checked,ro=($('rown')||{}).checked;
- if(RS.i!=null)idx.sort((a,b)=>{const f=i=>{const c=R.rows[i].v[RS.i].chg;return c==null?-1e9:c};return RS.dir*(f(b)-f(a))});
- const chips=R.markets.map((n,k)=>{let ng=0,ps=0;R.rows.forEach((r,i)=>{if(lv[i]<1)return;const c=fc(r.v[k]);if(c==='cf-neg')ng++;if(c==='cf-pos')ps++});
-  return`<button class="chip ${RS.i===k?'on':''}" onclick="sortM(${k})"><b>${esc(n)}</b> <span class="neg">▼${ng}</span> <span class="pos">▲${ps}</span></button>`}).join('');
- let body='';
- idx.forEach(i=>{const r=R.rows[i],L=lv[i];
-  if(q&&!r.name.toLowerCase().includes(q.toLowerCase()))return;
-  if(ro&&!isOwn(r.name)&&L>0)return;
-  const fcells=R.markets.map((_,k)=>fc(r.v[k]));if(fo&&!fcells.some(Boolean))return;
-  const cls=(L===0&&norm(r.name)!=='CPD'?'band':'')+(norm(r.name)==='CPD'?' cpd':'');
-  body+=`<tr class="${cls}"><td style="padding-left:${12+(RS.i!=null?0:L)*18}px">${esc(r.name)}</td>${R.markets.map((_,k)=>{const x=r.v[k]||{};
-   return`<td class="sep">${f1(x.shr)}</td><td class="${cl(x.chg)} ${fl?fcells[k]:''}">${pcx(x.chg)}</td>`}).join('')}</tr>`});
- $('view').innerHTML=`<div class="filters in"><span class="t">Period</span><span class="yel">${esc(R.label)}</span><span class="t">$</span>
-  <input type="search" id="rq" placeholder="Search…" value="${esc(q)}" oninput="recapView(null,$('pk').value)">
-  <label class="chk"><input type="checkbox" id="rfl" ${fl?'checked':''} onchange="draw()"> Flags</label>
-  <label class="chk"><input type="checkbox" id="rfo" ${fo?'checked':''} onchange="draw()"> Flagged rows only</label>
-  <label class="chk"><input type="checkbox" id="rown" ${ro?'checked':''} onchange="draw()"> Own brands</label>
-  <button class="btn" onclick="RS.i=null;draw()">Reset order</button><button class="btn" onclick="csvRecap()">Export CSV</button></div>
-  <div class="chips in" style="--i:1">${chips}</div>
-  <div class="glass in" style="--i:2"><div class="scroll"><table class="rc"><thead><tr><th rowspan="2">Franchise</th>${R.markets.map((n,k)=>`<th colspan="2" onclick="sortM(${k})">${esc(n)}</th>`).join('')}</tr>
-  <tr><th></th>${R.markets.map(()=>`<th class="sep">$ Shr</th><th>$ % Chg YA</th>`).join('')}</tr></thead><tbody>${body}</tbody></table></div></div>
-  <div class="note" style="margin-top:10px">Flag rule: share ≥ ${S.minShr} pts and % Chg YA ≤ −${S.decl}% (red) or ≥ +${S.grow}% (green). Change thresholds in ⚙. Click a market to sort by its % Chg.</div>`;
- const rq=$('rq');if(q){rq.focus();rq.setSelectionRange(q.length,q.length)}}
-function csvRecap(){const R=recap($('pk').value);const o=[['Franchise',...R.markets.flatMap(n=>[n+' Shr',n+' %Chg'])]];
- R.rows.forEach(r=>o.push([r.name,...R.markets.flatMap((_,k)=>[(r.v[k]||{}).shr??'',(r.v[k]||{}).chg??''])]));dlCsv(o,'nielsen_recap.csv')}
-function dlCsv(o,n){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([o.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n')],{type:'text/csv'}));a.download=n;a.click()}
+/* ===================== MARKETS (player x market matrix) ===================== */
+const MXM={dp:['$ % chg',x=>x.dp,sp],up:['Units % chg',x=>x.up,sp],ds:['$ share',x=>x.ds,f1],dsc:['$ share chg (pts)',x=>x.dsc,v=>fin(v)?(v>=0?'+':'')+v.toFixed(1):'n/a'],ctg:['CTG % (within market)',x=>x.ctg,f1],prp:['Avg $/unit % chg',x=>x.prp,sp]};
+function renderMarkets(){const def=['MASS','CPD','L OREAL PARIS','GARNIER','WELLA','HENKEL','REST OF MARKET','JUST FOR MEN','MANIC PANIC'].filter(has);
+ const players=(ST.mxPlayers||def).filter(has);const[mn,mf,mfmt]=MXM[ST.mxMetric];const ms=ST.mkts.slice().sort((a,b)=>mgroup(a).localeCompare(mgroup(b)));
+ const heat=(v,metric)=>{if(!fin(v))return'';if(metric==='ds')return'';const s=metric==='dsc'?v/3:metric==='ctg'?v/60:v/25;const a=Math.min(Math.abs(s),1)*.32;return`background:rgba(${v>0?'22,160,70':'220,50,60'},${a})`};
+ let g='';const N=get('MASS',ST.nat);
+ $('app').innerHTML=`<div class="ctl noprint" style="margin-bottom:10px"><label>Metric <select id="mxm">${Object.entries(MXM).map(([k,v])=>`<option value="${k}" ${k===ST.mxMetric?'selected':''}>${v[0]}</option>`).join('')}</select></label>
+ <label>Add player <select id="mxa"><option value="">—</option>${ST.prods.filter(p=>/^[MBFS]$/.test(kb(p).l)&&!players.includes(p)).map(p=>`<option value="${esc(p)}">${esc(fullName(p))}</option>`).join('')}</select></label><button class="btn sm" id="mxr">Reset players</button><span class="hint" style="margin:0">${esc(perLabel(ST.per))} · click a column header to remove it</span></div>
+ <div class="tw wrap"><table><thead><tr><th>Market</th><th>% of national $</th>${players.map(p=>`<th data-rm="${esc(p)}" title="Remove">${esc(p==='MASS'?'Mass':pretty(p).replace(' (Schwarzkopf)','').replace(' (Clairol)',''))}</th>`).join('')}</tr></thead><tbody>
+ ${ms.map(m=>{const grp=mgroup(m);let h='';if(grp!==g){g=grp;h=`<tr class="grp"><td colspan="${players.length+2}">${grp.slice(2)}</td></tr>`}const T=get('MASS',m);
+  return h+`<tr><td>${esc(mlabel(m))}</td><td>${T&&N?f1(T.d/N.d*100):''}</td>${players.map(p=>{const x=get(p,m);const v=x?mf(x):null;return`<td style="${heat(v,ST.mxMetric)}">${x?(x.isNew&&/dp|up/.test(ST.mxMetric)?'NEW':mfmt(v)):''}</td>`}).join('')}</tr>`}).join('')}</tbody></table></div>`;
+ $('mxm').onchange=e=>{ST.mxMetric=e.target.value;renderMarkets()};
+ $('mxa').onchange=e=>{if(e.target.value){ST.mxPlayers=[...players,e.target.value];renderMarkets()}};
+ $('mxr').onclick=()=>{ST.mxPlayers=null;renderMarkets()};
+ document.querySelectorAll('th[data-rm]').forEach(th=>th.onclick=()=>{ST.mxPlayers=players.filter(p=>p!==th.dataset.rm);renderMarkets()})}
 
-/* ---------- FLAGS TAB ---------- */
-function spark(r){const ks=['y25','ytd','l13','lp'],v=ks.map(k=>(r.p[k]||{}).chg),mx=Math.max(1,...v.map(x=>Math.abs(x||0)));
- return`<svg width="${ks.length*16}" height="34">${v.map((x,i)=>{const h=Math.max(2,Math.abs(x||0)/mx*15);return`<rect x="${i*16}" y="${x>=0?17-h:17}" width="11" height="${h}" rx="3" fill="${(x||0)>=0?css('--pos'):css('--neg')}" opacity="${.45+.55*(i+1)/ks.length}"/>`}).join('')}</svg>`}
-function overview(m,pk){
- const rows=ARR(m),lab=M[m].labels,first=M[m].sections[0].rows;
- const pick=n=>first.find(r=>norm(r.name)===norm(n))||rows.find(r=>norm(r.name)===norm(n));
- const cards=['CPD','L OREAL PARIS','GARNIER','CLAIROL'].map(pick).filter(Boolean).map((r,i)=>{const p=r.p[pk]||{};
-  return`<div class="glass kpi in" style="--i:${i}"><div class="n">${esc(r.name)}</div><div class="v"><span data-v="${p.shr??0}">0</span></div>
-  <div class="c ${cl(p.chg)}">${pc(p.chg)} <span style="color:var(--mut);font-weight:500">vs YA · ${dl(p.d)}</span></div>
-  <div class="r">${spark(r)}<div>25 · YTD · 13W · LP</div></div></div>`}).join('');
- const own=$('ownOnly').checked,seen=new Set(),F=[];
- rows.forEach(r=>{const k=r.sec+'|'+norm(r.name);if(seen.has(k))return;seen.add(k);if(own&&!isOwn(r.name))return;const f=flags(r,pk);if(f.length)F.push({r,f})});
- const seenN=new Set(),FF=F.filter(x=>{const k=norm(x.r.name)+x.f.map(y=>y.t).join();if(seenN.has(k))return false;seenN.add(k);return true})
-  .sort((a,b)=>Math.abs((b.r.p[pk]||{}).d||0)-Math.abs((a.r.p[pk]||{}).d||0));
- const item=x=>{const p=x.r.p[pk]||{};return`<div class="flag"><div class="fl-n">${esc(x.r.name)}<span class="fl-s">${esc(x.r.sec)}</span><div>${x.f.map(pill).join('')}</div></div>
-  <div class="fl-r">${f1d(p.shr)} <span style="color:var(--mut);font-weight:500">shr</span><small class="${cl(p.chg)}">${pc(p.chg)} · ${dl(p.d)}</small></div></div>`};
- const bad=FF.filter(x=>x.f.some(y=>y.c==='neg'||y.c==='warn')),good=FF.filter(x=>!bad.includes(x));
- const mv=[],sn=new Set();rows.forEach(r=>{const n=norm(r.name);if(sn.has(n)||AGG.has(n)||/^TL /.test(n))return;sn.add(n);if(own&&!isOwn(r.name))return;const d=(r.p[pk]||{}).d;if(d!=null)mv.push([r.name,d])});
- mv.sort((a,b)=>b[1]-a[1]);const top=[...mv.slice(0,8),...mv.slice(-8)].filter((x,i,a)=>a.indexOf(x)===i);
- $('view').innerHTML=`<div class="kpis">${cards}</div>
- <div class="g2"><div class="glass panel in" style="--i:4"><h3>Needs attention <span class="cnt">${bad.length}</span></h3>${bad.slice(0,12).map(item).join('')||'<div class="note">Nothing flagged</div>'}</div>
- <div class="glass panel in" style="--i:5"><h3>Momentum &amp; wins <span class="cnt">${good.length}</span></h3>${good.slice(0,12).map(item).join('')||'<div class="note">Nothing flagged</div>'}</div></div>
- <div class="glass panel in" style="--i:6"><h3>Top $ movers vs YA · ${esc(lab[pk]||pk)}</h3><canvas id="ch" height="90"></canvas></div>`;
- countUp();
- charts.a=new Chart($('ch'),{type:'bar',data:{labels:top.map(x=>x[0]),datasets:[{data:top.map(x=>x[1]),backgroundColor:top.map(x=>x[1]>=0?css('--pos'):css('--neg')),borderRadius:10,borderSkipped:false}]},
-  options:{animation:{duration:1100,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>dl(c.raw)}}},scales:{y:{ticks:{callback:v=>dl(v)}},x:{grid:{display:false},ticks:{maxRotation:60}}}}})}
+/* ===================== KNOWLEDGE ===================== */
+function renderKB(){const uni=ST.universe;const tracked=new Set(ST.prods);
+ const L={T:'Total',M:'Manufacturer',B:'Brand',F:'Franchise',S:'Sub-franchise',X:'Segment',XM:'Mfr × segment',XB:'Brand × segment'};
+ const lines=(ST.prods.length?ST.prods:Object.keys(KB)).map(kb);
+ const ub={};for(const[b,s,v]of uni){(ub[b]??={b,tot:0,subs:[]});ub[b].tot+=v;ub[b].subs.push([s,v])}
+ const ubs=Object.values(ub).sort((a,b)=>b.tot-a.tot);const utot=ubs.reduce((a,b)=>a+b.tot,0);
+ const inTL=n=>tracked.has(n)||[...tracked].some(t=>kb(t).b===n);
+ $('app').innerHTML=`<div class="grid g2">
+ <div class="card pad"><h3>Hierarchy & segment map ${ST.prods.length?`<span class="faint sm">(${ST.prods.length} lines in file)</span>`:''}</h3>
+  <div class="hint">How each line in the TL file is understood. Segment chips = which franchises compete in each segment (drives winners/drainers and launch incrementality in the note). ${ST.deckSeg?'Loaded from the deck’s By Period sheet.':'Defaults mirror the deck’s By Period sheet.'} Click to change — saved in this browser.</div>
+  <div class="ctl" style="margin-bottom:8px"><input type="search" id="kq" placeholder="Filter…" style="width:220px"><button class="btn sm" id="kres">Reset to defaults</button></div>
+  <div class="tw wrap"><table id="kt"><thead><tr><th>Line</th><th>Level</th><th>Brand</th><th>Manufacturer</th><th>Parent</th><th style="text-align:left">Segments</th></tr></thead><tbody>${lines.map(e=>`<tr data-n="${esc(e.n)}"><td>${esc(pretty(e.n))}${e.src==='inferred'?' <span class="pill p-warn">inferred</span>':''}</td><td>${L[e.l]||e.l}</td><td>${e.b?esc(BRANDPRETTY(e.b)):''}</td><td>${/^[BFS]$/.test(e.l)?esc(pretty(mfOf(e.n)||'')):''}</td><td>${e.p?esc(pretty(e.p)):''}</td><td class="l">${/^[BFS]$|^XB$/.test(e.l)?`<div class="chips">${SEGS.map(s=>`<span class="chip ${(SEGMEM[s.k]||[]).includes(e.n)?'on':''}" data-s="${s.k}">${s.name}</span>`).join('')}</div>`:(SEGS.find(s=>s.row===e.n)?'<span class="mut">segment total · '+(segCands(SEGS.find(s=>s.row===e.n).k).length)+' members</span>':'')}</td></tr>`).join('')}</tbody></table></div></div>
+ <div class="card pad"><h3>Brand universe <span class="faint sm">${ST.uniFile?esc(ST.uniFile):'built-in · NielsenIQ L52W to 24/10/26'} · $${big(utot)}</span></h3>
+  <div class="hint">All brands and sub-brands/franchises in Canadian hair colour. Upload a newer "BRAND / SUB BRAND / $" table to refresh. Green = tracked as a line in the TL file.</div>
+  <div class="tw wrap"><table><thead><tr><th>Brand / sub-brand</th><th>$ L52W</th><th>% of HC</th><th>Owner</th></tr></thead><tbody>${ubs.map(u=>`<tr class="lv0"><td><span class="tag ${inTL(u.b)||tracked.has(u.b)?'ok':'no'}">${esc(BRANDPRETTY(u.b))}</span></td><td>$${big(u.tot)}</td><td>${(u.tot/utot*100).toFixed(2)}</td><td class="l">${esc(OWNER[mfOf(u.b)]||OWNER[u.b]||(u.b==='SCHWARZKOPF'||u.b==='GOT 2B'?'Henkel':u.b==='CLAIROL'?'Wella Company':['L OREAL PARIS','GARNIER'].includes(u.b)?"L'Oréal CPD":''))}</td></tr>${u.subs.filter(s=>s[0]!=='*').sort((a,b)=>b[1]-a[1]).map(([s,v])=>`<tr><td style="padding-left:30px">${tracked.has(s)?'<span class="tag ok">'+esc(tc(s))+'</span>':esc(tc(s))}</td><td>$${big(v)}</td><td>${(v/utot*100).toFixed(2)}</td><td></td></tr>`).join('')}`).join('')}</tbody></table></div></div></div>`;
+ $('kq').oninput=e=>{const q=e.target.value.toUpperCase();document.querySelectorAll('#kt tbody tr').forEach(tr=>tr.style.display=!q||tr.dataset.n.includes(q)||tr.textContent.toUpperCase().includes(q)?'':'none')};
+ $('kres').onclick=()=>{LS.set('hcp.segmem',null);buildKB();MC.clear();renderKB();toast('Segment map reset to '+(ST.deckSeg?'deck':'defaults'))};
+ document.querySelectorAll('#kt .chip').forEach(ch=>ch.onclick=()=>{const n=ch.closest('tr').dataset.n,s=ch.dataset.s;const a=SEGMEM[s]||(SEGMEM[s]=[]);SEGMEM[s]=a.includes(n)?a.filter(x=>x!==n):[...a,n];ch.classList.toggle('on');LS.set('hcp.segmem',SEGMEM)})}
 
-/* ---------- EXPLORER ---------- */
-function explorer(m,pk){
- const secs=M[m].sections;
- $('view').innerHTML=`<div class="filters in"><span class="t">Section</span><select id="sec" onchange="tbl()"><option value="">All</option>${secs.map(s=>`<option>${esc(s.name)}</option>`).join('')}</select>
- <span class="t">Metric</span><select id="met" onchange="tbl()"><option value="chg">% Chg YA</option><option value="shr">$ Share</option><option value="d">$ Chg YA</option></select>
- <input type="search" id="q" placeholder="Search franchise…" oninput="tbl()"><label class="chk"><input type="checkbox" id="fo" onchange="tbl()"> Flagged only</label>
- <button class="btn" onclick="csv()">Export CSV</button></div><div class="glass in" style="--i:1"><div class="scroll"><table id="t"></table></div></div>`;tbl()}
-function tbl(){const m=$('mk').value,pk=$('pk').value,met=$('met').value,q=$('q').value.toLowerCase(),sv=$('sec').value,fo=$('fo').checked,lab=M[m].labels;
- const fm=met==='chg'?pc:met==='shr'?f1d:dl;
- let h=`<thead><tr><th>Franchise</th>${PK.map(([k,l])=>`<th onclick="sortK='${k}';sortDir*=-1;tbl()">${esc(lab[k]||l)}${sortK===k?(sortDir<0?' ↓':' ↑'):''}</th>`).join('')}<th style="text-align:left">Flags · ${esc(lab[pk]||pk)}</th></tr></thead><tbody>`;
- M[m].sections.forEach(s=>{if(sv&&s.name!==sv)return;let rs=s.rows.filter(r=>(!q||r.name.toLowerCase().includes(q)));
-  rs=rs.map(r=>({r,f:flags(r,pk)})).filter(x=>!fo||x.f.length);
-  if(sortK)rs.sort((a,b)=>sortDir*(((a.r.p[sortK]||{})[met]??-1e15)-((b.r.p[sortK]||{})[met]??-1e15))*-1);
-  if(!rs.length)return;h+=`<tr class="sec"><td colspan="${PK.length+2}">${esc(s.name)}</td></tr>`;
-  rs.forEach(({r,f})=>{h+=`<tr class="${isOwn(r.name)?'own':''}"><td>${esc(r.name)}</td>${PK.map(([k])=>{const v=(r.p[k]||{})[met];
-   return`<td class="${met==='shr'?'':cl(v)}" style="${met==='shr'?'':heat((r.p[k]||{}).chg)}">${fm(v)}</td>`}).join('')}<td class="fl">${f.map(pill).join('')}</td></tr>`})});
- $('t').innerHTML=h+'</tbody>'}
-function csv(){const m=$('mk').value,pk=$('pk').value;const o=[['Market','Section','Franchise',...PK.flatMap(([k,l])=>[l+' Shr',l+' %Chg',l+' $Chg']),'Flags']];
- M[m].sections.forEach(s=>s.rows.forEach(r=>o.push([m,s.name,r.name,...PK.flatMap(([k])=>{const p=r.p[k]||{};return[p.shr??'',p.chg??'',p.d??'']}),flags(r,pk).map(x=>x.t).join('; ')])));dlCsv(o,'nielsen_flags.csv')}
-
-/* ---------- MARKETS (works from the recap data) ---------- */
-function compare(m,pk){
- const R=recap(pk);const names=R.rows.map(r=>r.name);
- $('view').innerHTML=`<div class="filters in"><span class="t">Franchise</span><input id="it" list="dl" value="${esc(names.find(n=>norm(n)==='CPD')||names[0])}" onchange="cmp()"><datalist id="dl">${names.map(n=>`<option value="${esc(n)}">`).join('')}</datalist><span class="yel">${esc(R.label)}</span></div>
- <div class="g2"><div class="glass panel in" style="--i:1"><h3>% Chg YA by market</h3><canvas id="ch" height="170"></canvas></div><div class="glass panel in" style="--i:2"><h3>Detail</h3><div id="ct"></div></div></div>`;cmp()}
-function cmp(){const pk=$('pk').value,n=norm($('it').value),R=recap(pk);charts.c&&charts.c.destroy();
- const r=R.rows.find(x=>norm(x.name)===n);if(!r){$('ct').innerHTML='<div class="note">Not found.</div>';return}
- const rs=R.markets.map((mn,k)=>({m:mn,p:r.v[k]||{}})),b=rs[0],gap=x=>x===b||x.p.shr==null||b.p.shr==null?'–':((x.p.shr-b.p.shr>0?'+':'')+(x.p.shr-b.p.shr).toFixed(1));
- const hasD=rs.some(x=>x.p.d!=null);
- $('ct').innerHTML=`<table><thead><tr><th>Market</th><th>Share</th><th>Gap vs 1st</th><th>% Chg</th>${hasD?'<th>$ Chg</th>':''}</tr></thead><tbody>${rs.map(x=>`<tr><td>${esc(x.m)}</td><td>${f1d(x.p.shr)}</td><td>${gap(x)}</td><td class="${cl(x.p.chg)}">${pc(x.p.chg)}</td>${hasD?`<td class="${cl(x.p.d)}">${dl(x.p.d)}</td>`:''}</tr>`).join('')}</tbody></table>`;
- charts.c=new Chart($('ch'),{type:'bar',data:{labels:rs.map(x=>x.m),datasets:[{data:rs.map(x=>x.p.chg),backgroundColor:rs.map(x=>(x.p.chg||0)>=0?css('--pos'):css('--neg')),borderRadius:12,borderSkipped:false}]},options:{animation:{duration:900},plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v+'%'}},x:{grid:{display:false},ticks:{maxRotation:50}}}}})}
-sets();
+/* ===================== shell ===================== */
+function renderControls(){if(!ST.cube){$('ctl').innerHTML='';return}
+ $('ctl').innerHTML=`<label>Period <select id="per">${ST.pers.map(p=>`<option value="${p.k}" ${p.k===ST.per?'selected':''}>${esc(p.k==='m'?ST.label+' · '+p.label:p.label)}</option>`).join('')}</select></label>
+ <label>Market <select id="mkt">${ST.mkts.slice().sort((a,b)=>mgroup(a).localeCompare(mgroup(b))).map(m=>`<option value="${esc(m)}" ${m===ST.mkt?'selected':''}>${esc(mlabel(m))}</option>`).join('')}</select></label>`;
+ $('per').onchange=e=>{ST.per=e.target.value;render()};$('mkt').onchange=e=>{ST.mkt=e.target.value;render()}}
+function renderEmpty(){const u=LS.get('hcp.universe',null);
+ $('app').innerHTML=`<div class="drop"><b>Drop the TL MASS HC BY PERIOD workbook here</b><div class="mut">NielsenIQ export with Products · Markets · Periods · Facts columns. Read entirely in your browser — nothing is uploaded.</div>
+ <div style="margin-top:16px"><button class="btn pri" onclick="$('file').click()">Choose file(s)</button></div>
+ <div class="files"><span class="tag no">TL MASS HC file — not loaded</span><span class="tag ok">Brand universe — ${ST.uniFile?esc(ST.uniFile):'built-in ('+ST.universe.length+' brand/sub-brand lines)'}</span></div>
+ <div class="hint" style="max-width:640px;margin:18px auto 0">You can drop both files at once: the TL file drives every tab, the brand universe table (BRAND / SUB BRAND / $) refreshes the knowledge base.</div></div>`}
+function render(){MC.clear();document.querySelectorAll('#tabs button').forEach(b=>{b.classList.toggle('on',b.dataset.t===ST.tab);b.disabled=!ST.cube&&b.dataset.t!=='kb'});
+ renderControls();kill();
+ if(!ST.cube&&ST.tab!=='kb')return renderEmpty();
+ ({note:renderNote,ov:renderOverview,seg:renderSegments,br:renderBrands,mk:renderMarkets,kb:renderKB})[ST.tab]()}
+(function init(){const u=LS.get('hcp.universe',null);if(u&&u.rows&&u.rows.length){ST.universe=u.rows;ST.uniFile=u.file}
+ const t=LS.get('hcp.theme',null);if(t)document.documentElement.dataset.theme=t;
+ $('theme').onclick=()=>{const dark=document.documentElement.dataset.theme?document.documentElement.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;const n=dark?'light':'dark';document.documentElement.dataset.theme=n;LS.set('hcp.theme',n);render()};
+ $('upl').onclick=()=>$('file').click();$('file').onchange=e=>{handleFiles(e.target.files);e.target.value=''};
+ document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{ST.tab=b.dataset.t;render()});
+ addEventListener('dragover',e=>{e.preventDefault();document.body.classList.add('dragging')});
+ addEventListener('dragleave',e=>{if(!e.relatedTarget)document.body.classList.remove('dragging')});
+ addEventListener('drop',e=>{e.preventDefault();document.body.classList.remove('dragging');handleFiles(e.dataTransfer.files)});
+ render()})();
 </script>
 </body>
 </html>

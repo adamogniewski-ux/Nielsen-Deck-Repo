@@ -591,7 +591,13 @@ function strandArt(seed,mood){const r=hash(seed);const rnd=i=>{const v=Math.sin(
   const y=-40+i*24+rnd(i+1)*20,w=16+rnd(i+2)*26,a=60+rnd(i+3)*120;paths+=`<path d="M-40 ${y} C 120 ${y-a}, 260 ${y+a}, 460 ${y+20-rnd(i+4)*60}" stroke="url(#${id}${i})" stroke-width="${w.toFixed(1)}" fill="none" stroke-linecap="round" opacity="${(.55+rnd(i+5)*.45).toFixed(2)}"/>`}
  return`<svg viewBox="0 0 420 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs>${defs}<filter id="${id}b"><feGaussianBlur stdDeviation="1.2"/></filter><linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><rect width="420" height="260" fill="${pal[0]}"/><g filter="url(#${id}b)">${paths}</g><rect width="420" height="260" fill="url(#${id}s)"/></svg>`}
 const moodOf=p=>{const s=p&&segOf(p);return s==='BOLDS'||s==='BLEACH'?'bold':s==='ROOTS'?'cool':s==='AFG'?'warm':p&&/BLOND|BLEACH|LIGHT/.test(p)?'blonde':p&&/RED|FERIA/.test(p)?'red':null};
-const visual=(p,seed)=>{const u=imgFor(p);return u?`<img src="${u}" alt="${esc(p?pretty(p):'Hair colour')}">`:strandArt(seed||p||'hero',moodOf(p))};
+/* Generic stock photography (Pexels License, see img/CREDITS.md) — used when no brand photo has been uploaded */
+const STOCK={hero:['salon-colouring'],cat:['colour-close-up','salon-colouring'],cpd:['red-hair','copper-hair'],GREY:['grey-coverage','brush-application'],AFG:['brush-application','grey-coverage'],ROOTS:['roots-application'],AFR:['roots-application'],BOLDS:['bold-pink','bold-violet'],PBOLD:['bold-pink'],SBOLD:['bold-violet'],TBOLD:['bold-violet'],AFB:['bold-violet'],BLEACH:['foil-highlights'],any:['copper-hair','red-hair','bold-violet','foil-highlights','roots-application','colour-close-up','salon-colouring']};
+const USED=new Set();
+function stockFor(key){for(const k of [key,'any']){const pool=STOCK[k]||[];const f=pool.find(x=>!USED.has(x));if(f){USED.add(f);return'img/'+f+'.jpg'}}return null}
+const visual=(p,seed,key)=>{const u=imgFor(p);const alt=esc(p&&p!=='__hero'?pretty(p):'Hair colour');if(u)return`<img src="${u}" alt="${alt}">`;
+ const s=stockFor(key||(p==='__hero'?'hero':p?segOf(p)||'any':'any'));const art=strandArt(seed||p||'hero',moodOf(p));
+ return s?`<img src="${s}" alt="${alt}" loading="lazy" onerror="this.outerHTML=this.dataset.f" data-f="${esc(art)}">`:art};
 
 /* ===================== metrics ===================== */
 function gv(p,m,k,f){return ST.cube?.[p]?.[m]?.[k]?.[f]}
@@ -752,13 +758,13 @@ function insights(){const k=ST.per,M=get('MASS');if(!M||!M.hasYA)return[];const 
  const cpd=get('CPD'),Cm=mv(cpd);const fs=franchiseSet();
  /* 1 category */
  const mix=fin(M.dp)&&fin(M.up)?M.dp-M.up:0;
- out.push({tone:Mm.p>=0?'opp':'risk',tag:'Category',big:sp(Mm.p),p:null,seed:'cat'+L,title:`Mass Hair Colour ${Mm.p>=0?'is growing':'is declining'} in ${L}`,
+ out.push({tone:Mm.p>=0?'opp':'risk',tag:'Category',key:'cat',big:sp(Mm.p),p:null,seed:'cat'+L,title:`Mass Hair Colour ${Mm.p>=0?'is growing':'is declining'} in ${L}`,
   why:`${ML()} ${fV(Mm.v)} (${fC(Mm.c)}); ${isD()?'units':'$'} ${sp(Mm.op)}; avg $/unit ${sp(M.prp)}.`,
   act:Math.abs(mix)<1.5?'Growth is volume-led — keep availability and in-store visibility strong.':mix>0?'Growth is price/mix-led — watch unit elasticity before the next price move.':'Units outpace $ — shoppers are trading down; protect value packs and entry price points.'});
  /* 2 CPD share */
  if(cpd&&fin(Cm.sc)){const mm=ST.mkts.filter(m=>m!==ST.nat&&get('MASS',m)&&get('MASS',m).d>=get('MASS',ST.nat).d*0.03&&get('CPD',m)&&mgroup(m)!=='3 Regions'&&mgroup(m)!=='4 SDM regions');
   const sh=mm.map(m=>[m,mv(get('CPD',m)).sc]).filter(a=>fin(a[1])).sort((a,b)=>a[1]-b[1]);const lo=sh[0],hi=sh[sh.length-1];
-  out.push({tone:Cm.sc>=0.05?'opp':Cm.sc<=-0.05?'risk':'watch',tag:'CPD share',big:spp(Cm.sc),p:'CPD',seed:'cpd'+L,title:`CPD ${Cm.sc>=0?'gained':'lost'} share — now ${f1(Cm.s)}%`,
+  out.push({tone:Cm.sc>=0.05?'opp':Cm.sc<=-0.05?'risk':'watch',tag:'CPD share',key:'cpd',big:spp(Cm.sc),p:'CPD',seed:'cpd'+L,title:`CPD ${Cm.sc>=0?'gained':'lost'} share — now ${f1(Cm.s)}%`,
    why:`${ML()} ${sp(Cm.p)} vs category ${sp(Mm.p)}.${hi&&hi[1]>0?` Strongest in ${mshort(hi[0])} (${spp(hi[1])})`:''}${lo&&lo[1]<0?`, weakest in ${mshort(lo[0])} (${spp(lo[1])}).`:'.'}`,
    act:lo&&lo[1]<0?`Prioritise ${mshort(lo[0])}: review promo calendar, shelf and out-of-stocks.`:'Share is improving across key accounts — keep investment behind the winners.'})}
  /* 3 biggest CPD win, 4 biggest CPD drag */
@@ -771,7 +777,7 @@ function insights(){const k=ST.per,M=get('MASS');if(!M||!M.hasYA)return[];const 
  const best=rankBy(sg,a=>mv(a[1]).p-Mm.p)[0];
  if(best){const[s,x]=best;const m=mv(x);const top=topBy(segCands(s.k).map(p=>[p,get(p)]).filter(a=>a[1]),a=>mv(a[1]).c);
   const theme={AFG:'gentle',AFR:'gentle',ROOTS:'roots',GREY:'grey',BOLDS:'fun',BLEACH:'fun'}[s.k];const fact=ST.ua&&ST.ua.facts.find(f=>f.k===theme&&f.stat);
-  out.push({tone:m.p>Mm.p?'opp':'watch',tag:'Consumer need',big:sp(m.p),p:top?top[0]:null,seed:s.k,title:`${s.name} is ${m.p>Mm.p?'outgrowing':'tracking'} the category`,
+  out.push({tone:m.p>Mm.p?'opp':'watch',tag:'Consumer need',key:s.k,big:sp(m.p),p:top?top[0]:null,seed:s.k,title:`${s.name} is ${m.p>Mm.p?'outgrowing':'tracking'} the category`,
    why:`${f1(x.ds)}% of the category, ${ML()} ${sp(m.p)} vs ${sp(Mm.p)}${top?`; led by ${fullName(top[0])}`:''}.${fact?` U&A: ${fact.stat} ${fact.label.replace(/\.$/,'')}.`:''}`,
    act:theme==='gentle'?'Lead with care credentials (no ammonia, fewer chemicals) on pack and online.':theme==='roots'?'Win the in-between occasion with quick root fixes next to permanent colour.':'Back the segment winners rather than broad range extensions.'})}
  /* 6 competitor threat */
@@ -787,18 +793,19 @@ function signals(){const M=get('MASS');if(!M||!M.hasYA)return[];const s=[];
  if(lose)s.push(`<b>Lagging segment:</b> ${lose[0].name} $ ${C(lose[1].dp,sp(lose[1].dp))} (${f1(lose[1].ds)}% WOB).`);
  const R=get('REST OF MARKET');if(R?.hasYA)s.push(`<b>Rest of market:</b> $ ${C(R.dp,sp(R.dp))}, share ${spp(R.dsc)} — ${R.dp>M.dp?'smaller brands outgrowing the big three':'big three holding'}.`);
  return s}
-function renderHighlights(){kill();chartBase();const M=get('MASS');if(!M)return;const Mm=mv(M),cpd=get('CPD'),Cm=mv(cpd);const L=ST.per==='m'?ST.label:perShort(ST.per);const ins=insights();
+function renderHighlights(){kill();chartBase();USED.clear();const M=get('MASS');if(!M)return;const Mm=mv(M),cpd=get('CPD'),Cm=mv(cpd);const L=ST.per==='m'?ST.label:perShort(ST.per);const ins=insights();
  const T={opp:['Opportunity','t-opp'],risk:['Risk','t-risk'],watch:['Watch','t-watch']};
  $('app').innerHTML=`<section class="glass hero"><div class="txt"><div class="eyebrow">${esc(L)} · ${esc(mlabel(ST.mkt))}</div>
   <h1>${M.hasYA?`Mass Hair Colour ${Mm.p>=0?'up':'down'} ${sp(Mm.p).replace(/^[+-]/,'')}${cpd&&fin(Cm.sc)?`, CPD ${Cm.sc>=0?'gaining':'losing'} share`:''}`:'Hair colour market snapshot'}</h1>
   <div class="sub">${esc(perLabel(ST.per))} · NielsenIQ${ST.ua?' · consumer lens: '+esc(ST.ua.title):''}</div>
   <div class="kp"><div><b>${fV(Mm.v)}</b><span>Mass ${ML()}</span></div><div><b class="${cls(Mm.p)}">${sp(Mm.p)}</b><span>vs year ago</span></div>${cpd?`<div><b>${f1(Cm.s)}%</b><span>CPD ${SL()}</span></div><div><b class="${cls(Cm.sc)}">${spp(Cm.sc)}</b><span>CPD share chg</span></div>`:''}</div></div>
-  <div class="art">${visual('__hero','hero-'+L)}</div></section>
- ${ins.length?`<div class="ins">${ins.map(i=>`<article class="glass icard"><div class="pic">${visual(i.p,i.seed)}<span class="badge tone ${T[i.tone][1]}"><i></i>${T[i.tone][0]} · ${esc(i.tag)}</span></div>
+  <div class="art">${visual('__hero','hero-'+L,'hero')}</div></section>
+ ${ins.length?`<div class="ins">${ins.map(i=>`<article class="glass icard"><div class="pic">${visual(i.p,i.seed,i.key)}<span class="badge tone ${T[i.tone][1]}"><i></i>${T[i.tone][0]} · ${esc(i.tag)}</span></div>
   <div class="bd"><div class="big ${i.tone==='risk'?'neg':i.tone==='opp'?'pos':'warn'}">${esc(i.big)}</div><h4>${esc(i.title)}</h4><div class="why">${esc(i.why)}</div><div class="act">${esc(i.act)}</div></div></article>`).join('')}</div>`:`<div class="glass pad">No year-ago data for this period — pick ${esc(ST.label)}, L13W or YTD to see insights.</div>`}
  ${signals().length?`<div class="glass pad" style="margin-top:14px"><h3>Other signals</h3><div class="signals">${signals().map(s=>`<div>${s}</div>`).join('')}</div></div>`:''}
  ${M.hasYA?`<div class="grid g2" style="margin-top:14px"><div class="glass pad"><h3>Who is driving growth — and loss</h3><div class="hint" style="margin:-4px 0 6px">Share of total absolute ${ML()} gains (right) and losses (left) by franchise · blue = CPD</div><div class="chartbox" style="height:380px"><canvas id="h1"></canvas></div></div>
-  <div class="glass pad"><h3>Segments vs category</h3><div id="hsegs" class="bars"></div><h3 style="margin-top:18px">Where CPD is gaining / losing share</h3><div id="hmk" class="bars"></div></div></div>`:''}`;
+  <div class="glass pad"><h3>Segments vs category</h3><div id="hsegs" class="bars"></div><h3 style="margin-top:18px">Where CPD is gaining / losing share</h3><div id="hmk" class="bars"></div></div></div>`:''}
+ <div class="hint" style="margin:12px 6px">Imagery: generic stock photos from Pexels (not L'Oréal products) — drop approved brand photos on Home to replace them.</div>`;
  if(!M.hasYA)return;
  const fsx=franchiseSet().map(p=>[p,contrib(p,'fr')]).filter(a=>a[1]);const g=rankBy(fsx.filter(a=>a[1].t==='G'),a=>a[1].v).slice(0,6),l=rankBy(fsx.filter(a=>a[1].t==='L'),a=>a[1].v).slice(0,6);const arr=[...g,...l.reverse()];
  charts.h1=new Chart($('h1'),{type:'bar',data:{labels:arr.map(a=>fullName(a[0])),datasets:[{data:arr.map(a=>a[1].t==='G'?a[1].v:-a[1].v),backgroundColor:arr.map(a=>isCPD(a[0])?(a[1].t==='G'?'#2456e6':'#86a2f7'):(a[1].t==='G'?'#10b981':'#ef4444')),borderRadius:6}]},options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const a=arr[c.dataIndex];return`${ctxt(a[1])} · ${fC(mv(get(a[0])).c)}`}}}},scales:{x:{ticks:{callback:v=>Math.abs(v)+'%'}}}}});
